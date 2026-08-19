@@ -1,5 +1,6 @@
 com\propertyhub\property\mapper\PropertyMapper.class
 com\propertyhub\property\PropertyServiceApplication.class
+com\propertyhub\property\dto\response\PropertySummaryResponse.class
 com\propertyhub\property\repository\PropertyRepository.class
 com\propertyhub\property\controller\PropertyController.class
 com\propertyhub\property\entity\Furnishing.class
@@ -9,6 +10,7 @@ com\propertyhub\property\exception\ResourceNotFoundException.class
 com\propertyhub\property\entity\Property.class
 com\propertyhub\property\dto\request\CreatePropertyRequest.class
 com\propertyhub\property\entity\PropertyType.class
+com\propertyhub\property\exception\InvalidSearchException.class
 com\propertyhub\property\service\PropertyService.class
 com\propertyhub\property\exception\ErrorResponse.class
 com\propertyhub\property\dto\response\PropertyResponse.class

@@ -2,6 +2,7 @@ package com.propertyhub.property.mapper;
 
 import com.propertyhub.property.dto.request.CreatePropertyRequest;
 import com.propertyhub.property.dto.response.PropertyResponse;
+import com.propertyhub.property.dto.response.PropertySummaryResponse;
 import com.propertyhub.property.entity.Property;
 
 public final class PropertyMapper {
@@ -39,6 +40,20 @@ public final class PropertyMapper {
                 property.getAgentId(),
                 property.getCreatedAt(),
                 property.getUpdatedAt()
+        );
+    }
+
+    public static PropertySummaryResponse toSummary(Property property) {
+        return new PropertySummaryResponse(
+                property.getId(),
+                property.getTitle(),
+                property.getCity(),
+                property.getPrice(),
+                property.getBhk(),
+                property.getArea(),
+                property.getPropertyType(),
+                property.getFurnishing(),
+                property.isParking()
         );
     }
 

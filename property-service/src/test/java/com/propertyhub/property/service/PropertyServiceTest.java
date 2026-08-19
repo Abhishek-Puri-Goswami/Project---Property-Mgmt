@@ -3,9 +3,11 @@ package com.propertyhub.property.service;
 import com.propertyhub.property.dto.request.CreatePropertyRequest;
 import com.propertyhub.property.dto.request.UpdatePropertyRequest;
 import com.propertyhub.property.dto.response.PropertyResponse;
+import com.propertyhub.property.dto.response.PropertySummaryResponse;
 import com.propertyhub.property.entity.Furnishing;
 import com.propertyhub.property.entity.Property;
 import com.propertyhub.property.entity.PropertyType;
+import com.propertyhub.property.exception.InvalidSearchException;
 import com.propertyhub.property.exception.ResourceNotFoundException;
 import com.propertyhub.property.repository.PropertyRepository;
 import org.junit.jupiter.api.Test;
@@ -14,11 +16,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -135,6 +140,66 @@ class PropertyServiceTest {
                 new BigDecimal("100"), 1, new BigDecimal("100"),
                 PropertyType.APARTMENT, Furnishing.FURNISHED, false, 1L
         );
+    }
+
+    @Test
+    void searchReturnsMappedResultsForMatchingFilters() {
+        propertyService = new PropertyService(propertyRepository);
+        Property property = existingProperty();
+        when(propertyRepository.search(eq("Pune"), eq(2), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
+                .thenReturn(List.of(property));
+
+        List<PropertySummaryResponse> results = propertyService.search("Pune", 2, null, null, null, null, null, null, null);
+
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0).city()).isEqualTo("Pune");
+    }
+
+    @Test
+    void searchReturnsEmptyListWhenNoFiltersMatch() {
+        propertyService = new PropertyService(propertyRepository);
+        when(propertyRepository.search(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
+                .thenReturn(List.of());
+
+        List<PropertySummaryResponse> results = propertyService.search(null, null, null, null, null, null, null, null, null);
+
+        assertThat(results).isEmpty();
+    }
+
+    @Test
+    void searchThrowsWhenMinPriceGreaterThanMaxPrice() {
+        propertyService = new PropertyService(propertyRepository);
+
+        assertThatThrownBy(() -> propertyService.search(
+                null, null, new BigDecimal("9000000"), new BigDecimal("1000000"), null, null, null, null, null
+        )).isInstanceOf(InvalidSearchException.class);
+    }
+
+    @Test
+    void searchThrowsWhenMinAreaGreaterThanMaxArea() {
+        propertyService = new PropertyService(propertyRepository);
+
+        assertThatThrownBy(() -> propertyService.search(
+                null, null, null, null, new BigDecimal("2000"), new BigDecimal("500"), null, null, null
+        )).isInstanceOf(InvalidSearchException.class);
+    }
+
+    @Test
+    void searchThrowsWhenPriceIsNegative() {
+        propertyService = new PropertyService(propertyRepository);
+
+        assertThatThrownBy(() -> propertyService.search(
+                null, null, new BigDecimal("-1"), null, null, null, null, null, null
+        )).isInstanceOf(InvalidSearchException.class);
+    }
+
+    @Test
+    void searchThrowsWhenBhkNotPositive() {
+        propertyService = new PropertyService(propertyRepository);
+
+        assertThatThrownBy(() -> propertyService.search(
+                null, 0, null, null, null, null, null, null, null
+        )).isInstanceOf(InvalidSearchException.class);
     }
 
 }

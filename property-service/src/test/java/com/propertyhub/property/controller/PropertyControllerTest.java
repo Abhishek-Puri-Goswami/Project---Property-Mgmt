@@ -2,8 +2,10 @@ package com.propertyhub.property.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.propertyhub.property.dto.response.PropertyResponse;
+import com.propertyhub.property.dto.response.PropertySummaryResponse;
 import com.propertyhub.property.entity.Furnishing;
 import com.propertyhub.property.entity.PropertyType;
+import com.propertyhub.property.exception.InvalidSearchException;
 import com.propertyhub.property.exception.ResourceNotFoundException;
 import com.propertyhub.property.service.PropertyService;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -145,6 +148,30 @@ class PropertyControllerTest {
 
         mockMvc.perform(delete("/api/properties/99"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void returns200OnSearchWithFilters() throws Exception {
+        PropertySummaryResponse summary = new PropertySummaryResponse(
+                1L, "2BHK in Hinjewadi", "Pune", new BigDecimal("7200000"), 2,
+                new BigDecimal("1150"), PropertyType.APARTMENT, Furnishing.SEMI_FURNISHED, true
+        );
+        when(propertyService.search(eq("Pune"), eq(2), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(List.of(summary));
+
+        mockMvc.perform(get("/api/properties").param("city", "Pune").param("bhk", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].city").value("Pune"));
+    }
+
+    @Test
+    void returns400OnInvalidSearchRange() throws Exception {
+        when(propertyService.search(any(), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenThrow(new InvalidSearchException("minPrice must not be greater than maxPrice"));
+
+        mockMvc.perform(get("/api/properties").param("minPrice", "9000000").param("maxPrice", "1000000"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
     }
 
 }
