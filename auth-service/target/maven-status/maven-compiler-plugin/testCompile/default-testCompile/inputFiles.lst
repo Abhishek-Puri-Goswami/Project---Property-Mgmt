@@ -1,3 +1,5 @@
 D:\PropertyHub\auth-service\src\test\java\com\propertyhub\auth\AuthServiceApplicationTests.java
 D:\PropertyHub\auth-service\src\test\java\com\propertyhub\auth\controller\AuthControllerTest.java
+D:\PropertyHub\auth-service\src\test\java\com\propertyhub\auth\security\JwtAuthenticationFilterTest.java
 D:\PropertyHub\auth-service\src\test\java\com\propertyhub\auth\service\AuthServiceTest.java
+D:\PropertyHub\auth-service\src\test\java\com\propertyhub\auth\service\JwtServiceTest.java

@@ -16,6 +16,10 @@ spring:
       hibernate:
         format_sql: true
 
+jwt:
+  secret: ${JWT_SECRET:dev-only-secret-key-change-me-before-production-32bytes+}
+  expiration-ms: ${JWT_EXPIRATION_MS:3600000}
+
 eureka:
   client:
     service-url:

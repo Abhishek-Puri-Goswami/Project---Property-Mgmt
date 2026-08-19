@@ -1,3 +1,5 @@
+com\propertyhub\auth\security\JwtAuthenticationFilterTest.class
 com\propertyhub\auth\service\AuthServiceTest.class
 com\propertyhub\auth\AuthServiceApplicationTests.class
+com\propertyhub\auth\service\JwtServiceTest.class
 com\propertyhub\auth\controller\AuthControllerTest.class
