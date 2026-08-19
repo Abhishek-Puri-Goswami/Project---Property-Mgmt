@@ -1,1 +1,12 @@
 D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\AuthServiceApplication.java
+D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\config\PasswordEncoderConfig.java
+D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\controller\AuthController.java
+D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\dto\request\RegisterRequest.java
+D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\dto\response\UserResponse.java
+D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\entity\Role.java
+D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\entity\User.java
+D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\exception\ErrorResponse.java
+D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\exception\GlobalExceptionHandler.java
+D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\exception\UserAlreadyExistsException.java
+D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\repository\UserRepository.java
+D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\service\AuthService.java

@@ -1,1 +1,3 @@
+com\propertyhub\gateway\filter\RequestLoggingFilter.class
 com\propertyhub\gateway\ApiGatewayApplication.class
+com\propertyhub\gateway\config\CorsConfig.class
