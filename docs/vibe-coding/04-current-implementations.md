@@ -1,4 +1,4 @@
-# PropertyHub — Current Implementation Log (STEP-01 through STEP-15)
+# PropertyHub — Current Implementation Log (STEP-01 through STEP-16)
 
 ## Purpose
 
@@ -432,14 +432,53 @@ feign-okhttp                 (version managed by Spring Cloud BOM)
 
 ---
 
+## STEP-16 — Buyer/Agent React Application Foundation
+
+**Objective (per `01-development-plan.md`, Day-2 first frontend STEP):** Axios client, route/screen structure, Claymorphism design system, form/card/table components, loading/empty/error states, toast system with consistent timeout, authentication state. Scaffolding only — no business-logic page content (that's STEP-17/STEP-18) and no new backend endpoints.
+
+**Starting state:** `frontend/` was a bare Vite+React 19 app from STEP-01 (`App.jsx` rendered only `<h1>PropertyHub</h1>`); Vitest/jsdom already configured; `axios` already a dependency.
+
+**Created:**
+- `src/styles/theme.css` — Claymorphism design tokens (soft-shadow `.clay`/`.clay-inset` utility classes, color/spacing/radius CSS variables).
+- `src/context/AuthContext.jsx` — `AuthProvider`/`useAuth()`, `{user, token}` persisted to `localStorage` under `propertyhub_auth`, `login()`/`logout()`, `isAuthenticated`.
+- `src/context/ToastContext.jsx` — `ToastProvider`/`useToast()`, `showToast(message, type)`, fixed 4000ms auto-dismiss timeout.
+- `src/api/axiosClient.js` — single shared Axios instance; `baseURL` from `VITE_API_BASE_URL` (default `http://localhost:8080`, the API Gateway); request interceptor attaches `Authorization: Bearer <token>` read directly from `localStorage` (interceptors run outside the React tree, so they read storage directly rather than via the context); response interceptor normalizes both backend `ErrorResponse` bodies and network errors into one consistent `{status, error, message, fieldErrors}` shape.
+- `src/components/common/` — `Button`, `Input`, `Select`, `Card`, `Table`, `Modal`, `LoadingState`, `EmptyState`, `ErrorState`, `Toast` (the full reusable-pattern set required by `03-frontend-standards.md` §5).
+- `src/components/layout/AppLayout.jsx` — nav shell + `<Outlet/>` for authenticated routes; `ProtectedRoute.jsx` — redirects to `/login` when unauthenticated, supports an optional `roles` prop for future role-gating (STEP-17/19).
+- `src/pages/` — `LoginPage`, `RegisterPage`, `DashboardPage`, `PropertySearchPage`, `PropertyDetailsPage`, `FavoritesPage`, `ComparisonPage`, `VisitsPage`, `AiCopilotPage` — minimal placeholder content each, wired into routing now so the route/screen structure exists; real forms/data land in STEP-17/STEP-18.
+- Test files: `AuthContext.test.jsx`, `ToastContext.test.jsx`, `axiosClient.test.js`, `ProtectedRoute.test.jsx`, `Button.test.jsx`, `Modal.test.jsx`, `LoadingEmptyErrorState.test.jsx` — 16 tests total.
+- `src/setupTests.js` — imports `@testing-library/jest-dom/vitest` matchers, registered via `vite.config.js`'s new `test.setupFiles`.
+- `.claude/launch.json` — dev-server preview config (`npm --prefix frontend run dev`, port 5173) added for live browser validation.
+
+**Modified:**
+- `src/App.jsx` — full rewrite: `AuthProvider` + `ToastProvider` + `BrowserRouter`, public `/login`+`/register` routes, protected route tree under `AppLayout` (`/`, `/properties`, `/properties/:id`, `/favorites`, `/comparison`, `/visits`, `/ai-copilot`).
+- `src/main.jsx` — imports `theme.css`.
+- `vite.config.js` — added `test.setupFiles`.
+- `package.json` — added `react-router-dom`, `@testing-library/react`, `@testing-library/jest-dom`, `cross-env` (devDependency).
+
+**Key decisions:**
+- Context API for both auth and toast state — no external state-management library, per `03-frontend-standards.md` §13.
+- Plain CSS with custom properties for Claymorphism, not a CSS-in-JS or component library — keeps the stack intentionally small.
+- Placeholder pages built now (not deferred) so STEP-16's "route/screen structure" requirement is genuinely satisfied and STEP-17 has real routes to fill in, not routes to also create.
+
+**Issue & fix (one cycle, environment-specific — not a code defect in the strict sense, but required a script change to work around it):**
+- **Problem:** `npm run test` failed 8/16 tests, all and only in files touching `localStorage`, all with `TypeError: localStorage.clear is not a function`, alongside a Node warning: `` `--localstorage-file` was provided without a valid path ``. Root cause: this machine's Node 25 runtime exposes an experimental native global Web Storage API (`--experimental-webstorage`) that collides with jsdom's own `window.localStorage` implementation inside Vitest's jsdom environment, leaving `localStorage` present but missing methods like `.clear()`.
+- **Fix:** added `cross-env` as a devDependency and changed the `test`/`test:ui` npm scripts to `cross-env NODE_OPTIONS=--no-experimental-webstorage vitest run` (and `--ui`), disabling Node's experimental Web Storage globally for the test process so jsdom's own `localStorage` is used unshadowed. `cross-env` was used (rather than an inline shell-only `NODE_OPTIONS=...`) so the npm scripts work identically from PowerShell, cmd, and Bash on this Windows dev machine. Re-ran: 16/16 pass via the actual `npm run test` script.
+- **Lesson for future frontend STEPs:** if a test failure is isolated entirely to `localStorage`/`sessionStorage` usage with no logical connection to the code under test, suspect this same Node-vs-jsdom Web Storage collision before debugging the component code itself.
+
+**Validation result:** `npm run build` → clean production build (57 modules, ~236kB JS / ~1kB CSS). `npm run test` → 16/16 passing across 7 test files. Live (via the Browser pane, dev server on port 5173): unauthenticated `/` correctly redirected to `/login`; seeding `localStorage` with a fake auth object and reloading rendered the authenticated shell (`AppLayout` + `DashboardPage`); clicking the "Search" nav link routed to `PropertySearchPage`; clicking "Logout" cleared auth state and redirected back to `/login` — confirming the full `AuthContext` + `ProtectedRoute` + routing wiring works end-to-end, not just in unit tests.
+
+---
+
 # 5. Known Open Items / Gaps (not yet resolved, intentionally flagged)
 
 1. **Security gap:** `property-service`, `ai-service`, `api-gateway` have no authentication on their business endpoints. Only `auth-service` has JWT/Spring Security. This needs a dedicated future STEP — do not patch piecemeal.
 2. **Actuator endpoints are fully open (whitelist of `health,info,metrics`, not authenticated)** on all services except that auth-service's JWT filter explicitly permits them — this is linked to item 1 above; proper actuator security requires the broader security rollout first.
 3. Property Service's `agentId` and AI Service's `userId` are both supplied directly in request bodies (no JWT-derived identity) — will need to change once security is added everywhere.
+4. **Node/jsdom `localStorage` collision** on this machine's Node 25 runtime — permanently worked around via `cross-env NODE_OPTIONS=--no-experimental-webstorage` in the frontend's `test`/`test:ui` npm scripts (see STEP-16). Do not remove that env override from future script changes without confirming the underlying Node behavior has changed.
 
 ---
 
 # 6. Next STEP
 
-Per `01-development-plan.md`: **STEP-16 — Buyer/Agent React Application Foundation** (first frontend STEP — Axios client, route/screen structure, Claymorphism design system, form/card/table components, loading/empty/error states, toast system, authentication state). Not started as of this document's writing. Do not begin it automatically — wait for explicit user instruction, per `CLAUDE.md`'s lifecycle rules.
+Per `01-development-plan.md`: **STEP-17 — Buyer/Agent Property UI** (Login, Register, Dashboard, Property Search, Property Details, Favorites, Comparison, Scheduled Visits, Ask AI entry point — real forms/data wired via Axios into the STEP-16 scaffolding, mirroring backend validation, using success/error toasts). Not started as of this document's writing. Do not begin it automatically — wait for explicit user instruction, per `CLAUDE.md`'s lifecycle rules.
