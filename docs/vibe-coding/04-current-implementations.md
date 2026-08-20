@@ -1,4 +1,4 @@
-# PropertyHub — Current Implementation Log (STEP-01 through STEP-16)
+# PropertyHub — Current Implementation Log (STEP-01 through STEP-16A)
 
 ## Purpose
 
@@ -470,15 +470,39 @@ feign-okhttp                 (version managed by Spring Cloud BOM)
 
 ---
 
+## STEP-16A — Property Service: Favorites and Visits
+
+**Not part of the original `01-development-plan.md` sequence — inserted between STEP-16 and STEP-17.** While planning STEP-17 (frontend Favorites/Comparison/Visits screens), live inspection found that `00-project-requirements.md` documents `Favorite`/`Visit` as real property-service entities (`FavoriteController`, `VisitController`, `favorites`/`visits` tables, `VisitRequest`/`VisitResponse` DTOs — all explicitly named in the requirements doc's architecture section), but no STEP through STEP-16 had built them; only `Property` CRUD/search existed. This is exactly the kind of ambiguity `CLAUDE.md`'s Ambiguity Rule requires stopping for (materially affects architecture/API behavior) — asked the user via `AskUserQuestion` rather than silently deciding. **User chose: insert a dedicated backend STEP first**, rather than building STEP-17's Favorites/Visits UI against local-only state or skipping those screens. `01-development-plan.md` was updated to record this STEP in its proper sequence position (between STEP-16 and STEP-17), per explicit user instruction to document it in the required docs. `Comparison` needed no backend work — it's client-side-only (multi-select) per the requirements doc.
+
+**Created (property-service):**
+- `entity/{Favorite,Visit,VisitStatus}.java` — `Favorite`: `userId` (plain `Long`, cross-service reference to auth-service's User — same pattern as `Property.agentId`), `property` (real `@ManyToOne` to `Property`, since both are same-service/same-DB, unlike the cross-service `agentId`), unique `(user_id, property_id)`. `Visit`: `userId`, `property` (`@ManyToOne`), `scheduledAt`, `status` (`VisitStatus`: `PENDING`/`CONFIRMED`/`CANCELLED`, defaults to `PENDING` on creation), `notes` (nullable).
+- `dto/request/VisitRequest.java` (`userId` `@NotNull`, `scheduledAt` `@NotNull @Future`, `notes` optional), `dto/response/{FavoriteResponse,VisitResponse}.java`.
+- `exception/DuplicateResourceException.java` — new, for double-favoriting.
+- `mapper/{FavoriteMapper,VisitMapper}.java` — `@Component`, same ModelMapper-wrapping pattern as `PropertyMapper` (`FavoriteMapper` reuses `PropertyMapper.toSummary` for the nested property; `VisitMapper` builds `VisitResponse` manually since it flattens fields from both `Visit` and its `Property`).
+- `repository/{FavoriteRepository,VisitRepository}.java` — `VisitRepository.findByPropertyAgentId` uses a JPQL join (`WHERE v.property.agentId = :agentId`) to support the requirements doc's "AGENT can view scheduled visits" capability.
+- `service/{FavoriteService,VisitService}.java`, `controller/{FavoriteController,VisitController}.java`.
+- Six endpoints: `POST/DELETE/GET /api/properties/{id}/favorites` + `/api/properties/favorites?userId=`; `POST /api/properties/{id}/visits` + `GET /api/properties/visits?userId=|agentId=` (exactly one of the two query params required, enforced via the existing `InvalidSearchException` → `400 VALIDATION_ERROR`, reused rather than adding a new exception type for one validation case).
+- Tests: `FavoriteServiceTest` (6), `VisitServiceTest` (4), `FavoriteControllerTest` (6), `VisitControllerTest` (6) — 22 new tests.
+
+**Modified:**
+- `exception/GlobalExceptionHandler.java` — added `DuplicateResourceException` handler → `409 DUPLICATE_RESOURCE`.
+- `docs/vibe-coding/01-development-plan.md` — inserted the STEP-16A section between STEP-16 and STEP-17, so the plan document itself reflects the actual executed sequence.
+
+**Issues:** None — built and validated clean on the first attempt.
+
+**Validation result:** `mvn clean verify` (JDK 21) → BUILD SUCCESS, 51/51 tests (29 existing + 22 new). Live: seeded a property, then exercised all six endpoints via curl — favorite add (201) → duplicate add (409 `DUPLICATE_RESOURCE`) → list by user (200) → remove (204) → remove-again (404 `RESOURCE_NOT_FOUND`); visit schedule (201, status `PENDING`) → list by userId (200) → list by agentId (200, via the property join) → list with neither param (400 `VALIDATION_ERROR`) → schedule with a past date (400, `fieldErrors.scheduledAt`). `psql` schema inspection confirmed `favorites` has the `UNIQUE(user_id, property_id)` constraint and FK to `properties`, and `visits` has the FK, all `NOT NULL` columns, and Hibernate's auto-generated enum `CHECK` constraint on `status`.
+
+---
+
 # 5. Known Open Items / Gaps (not yet resolved, intentionally flagged)
 
 1. **Security gap:** `property-service`, `ai-service`, `api-gateway` have no authentication on their business endpoints. Only `auth-service` has JWT/Spring Security. This needs a dedicated future STEP — do not patch piecemeal.
 2. **Actuator endpoints are fully open (whitelist of `health,info,metrics`, not authenticated)** on all services except that auth-service's JWT filter explicitly permits them — this is linked to item 1 above; proper actuator security requires the broader security rollout first.
-3. Property Service's `agentId` and AI Service's `userId` are both supplied directly in request bodies (no JWT-derived identity) — will need to change once security is added everywhere.
+3. Property Service's `agentId`, `Favorite`/`Visit`'s `userId`, and AI Service's `userId` are all supplied directly in request bodies/params (no JWT-derived identity) — will need to change once security is added everywhere.
 4. **Node/jsdom `localStorage` collision** on this machine's Node 25 runtime — permanently worked around via `cross-env NODE_OPTIONS=--no-experimental-webstorage` in the frontend's `test`/`test:ui` npm scripts (see STEP-16). Do not remove that env override from future script changes without confirming the underlying Node behavior has changed.
 
 ---
 
 # 6. Next STEP
 
-Per `01-development-plan.md`: **STEP-17 — Buyer/Agent Property UI** (Login, Register, Dashboard, Property Search, Property Details, Favorites, Comparison, Scheduled Visits, Ask AI entry point — real forms/data wired via Axios into the STEP-16 scaffolding, mirroring backend validation, using success/error toasts). Not started as of this document's writing. Do not begin it automatically — wait for explicit user instruction, per `CLAUDE.md`'s lifecycle rules.
+Per `01-development-plan.md`: **STEP-17 — Buyer/Agent Property UI** (Login, Register, Dashboard, Property Search, Property Details, Favorites, Comparison, Scheduled Visits, Ask AI entry point — real forms/data wired via Axios into the STEP-16 scaffolding, mirroring backend validation, using success/error toasts). Favorites and Visits can now be wired to real backend endpoints per STEP-16A. Not started as of this document's writing. Do not begin it automatically — wait for explicit user instruction, per `CLAUDE.md`'s lifecycle rules.

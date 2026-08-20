@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.propertyhub.property.service.PropertyServiceTest" time="0.061" tests="15" errors="0" skipped="0" failures="0" flakes="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.propertyhub.property.service.VisitServiceTest" time="0.091" tests="4" errors="0" skipped="0" failures="0" flakes="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -66,52 +66,15 @@
     <property name="java.class.version" value="65.0"/>
     <property name="LOGGED_APPLICATION_NAME" value="[property-service] "/>
   </properties>
-  <testcase name="searchReturnsMappedResultsForMatchingFilters" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.007">
-    <system-out><![CDATA[2026-08-21T02:15:17.514+05:30  INFO 3024 --- [property-service] [           main] c.p.property.service.PropertyService     : Property search started
-2026-08-21T02:15:17.514+05:30  INFO 3024 --- [property-service] [           main] c.p.property.service.PropertyService     : Property search completed: resultCount=1
+  <testcase name="listByAgentReturnsMappedVisits" classname="com.propertyhub.property.service.VisitServiceTest" time="0.081"/>
+  <testcase name="scheduleThrowsResourceNotFoundExceptionWhenPropertyMissing" classname="com.propertyhub.property.service.VisitServiceTest" time="0.003">
+    <system-out><![CDATA[2026-08-21T02:15:17.657+05:30  INFO 3024 --- [property-service] [           main] c.p.property.service.VisitService        : Visit scheduling requested
 ]]></system-out>
   </testcase>
-  <testcase name="searchThrowsWhenPriceIsNegative" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.003">
-    <system-out><![CDATA[2026-08-21T02:15:17.520+05:30  INFO 3024 --- [property-service] [           main] c.p.property.service.PropertyService     : Property search started
-]]></system-out>
-  </testcase>
-  <testcase name="getByIdsReturnsMatchingSummaries" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.004"/>
-  <testcase name="searchThrowsWhenMinAreaGreaterThanMaxArea" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.002">
-    <system-out><![CDATA[2026-08-21T02:15:17.526+05:30  INFO 3024 --- [property-service] [           main] c.p.property.service.PropertyService     : Property search started
-]]></system-out>
-  </testcase>
-  <testcase name="createsAndReturnsProperty" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.011">
-    <system-out><![CDATA[2026-08-21T02:15:17.530+05:30  INFO 3024 --- [property-service] [           main] c.p.property.service.PropertyService     : Property creation requested
-2026-08-21T02:15:17.530+05:30  INFO 3024 --- [property-service] [           main] c.p.property.service.PropertyService     : Property created successfully
-]]></system-out>
-  </testcase>
-  <testcase name="deleteThrowsWhenNotFound" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.004">
-    <system-out><![CDATA[2026-08-21T02:15:17.543+05:30  WARN 3024 --- [property-service] [           main] c.p.property.service.PropertyService     : Property not found
-]]></system-out>
-  </testcase>
-  <testcase name="updateModifiesExistingProperty" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.004"/>
-  <testcase name="getThrowsWhenNotFound" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.004">
-    <system-out><![CDATA[2026-08-21T02:15:17.552+05:30  WARN 3024 --- [property-service] [           main] c.p.property.service.PropertyService     : Property not found
-]]></system-out>
-  </testcase>
-  <testcase name="getByIdsReturnsEmptyListWhenNoneFound" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.002"/>
-  <testcase name="searchThrowsWhenBhkNotPositive" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.002">
-    <system-out><![CDATA[2026-08-21T02:15:17.557+05:30  INFO 3024 --- [property-service] [           main] c.p.property.service.PropertyService     : Property search started
-]]></system-out>
-  </testcase>
-  <testcase name="deleteRemovesExistingProperty" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.002"/>
-  <testcase name="getReturnsPropertyWhenFound" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.003"/>
-  <testcase name="searchReturnsEmptyListWhenNoFiltersMatch" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.002">
-    <system-out><![CDATA[2026-08-21T02:15:17.565+05:30  INFO 3024 --- [property-service] [           main] c.p.property.service.PropertyService     : Property search started
-2026-08-21T02:15:17.565+05:30  INFO 3024 --- [property-service] [           main] c.p.property.service.PropertyService     : Property search completed: resultCount=0
-]]></system-out>
-  </testcase>
-  <testcase name="searchThrowsWhenMinPriceGreaterThanMaxPrice" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.002">
-    <system-out><![CDATA[2026-08-21T02:15:17.567+05:30  INFO 3024 --- [property-service] [           main] c.p.property.service.PropertyService     : Property search started
-]]></system-out>
-  </testcase>
-  <testcase name="updateThrowsWhenNotFound" classname="com.propertyhub.property.service.PropertyServiceTest" time="0.002">
-    <system-out><![CDATA[2026-08-21T02:15:17.570+05:30  WARN 3024 --- [property-service] [           main] c.p.property.service.PropertyService     : Property not found
+  <testcase name="listByUserReturnsMappedVisits" classname="com.propertyhub.property.service.VisitServiceTest" time="0.003"/>
+  <testcase name="scheduleCreatesPendingVisitForExistingProperty" classname="com.propertyhub.property.service.VisitServiceTest" time="0.003">
+    <system-out><![CDATA[2026-08-21T02:15:17.663+05:30  INFO 3024 --- [property-service] [           main] c.p.property.service.VisitService        : Visit scheduling requested
+2026-08-21T02:15:17.663+05:30  INFO 3024 --- [property-service] [           main] c.p.property.service.VisitService        : Visit scheduled successfully
 ]]></system-out>
   </testcase>
 </testsuite>

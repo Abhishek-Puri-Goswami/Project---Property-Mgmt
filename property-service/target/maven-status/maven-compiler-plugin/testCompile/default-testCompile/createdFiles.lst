@@ -1,3 +1,7 @@
 com\propertyhub\property\controller\PropertyControllerTest.class
+com\propertyhub\property\controller\VisitControllerTest.class
+com\propertyhub\property\service\VisitServiceTest.class
 com\propertyhub\property\service\PropertyServiceTest.class
+com\propertyhub\property\controller\FavoriteControllerTest.class
+com\propertyhub\property\service\FavoriteServiceTest.class
 com\propertyhub\property\PropertyServiceApplicationTests.class

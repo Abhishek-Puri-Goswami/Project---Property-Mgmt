@@ -441,6 +441,24 @@ Keep the UI simple and logical.
 
 ---
 
+## STEP-16A — Property Service: Favorites and Visits
+
+**Inserted STEP, not part of the original plan sequence.** Added after STEP-16 revealed that this plan's own architecture (§ Property Service Structure, § PostgreSQL Database) documents `Favorite`/`Visit` as real property-service entities (`FavoriteController`, `VisitController`, `favorites`/`visits` tables), required by STEP-17's Favorites and Scheduled Visits screens — but no STEP through STEP-16 had built them. Inserted ahead of STEP-17 so that STEP-17 can wire real Axios calls instead of local-only placeholder state, per explicit user decision (see `04-current-implementations.md` for the full record).
+
+Implement in property-service:
+
+- Favorite (user↔property, unique per user/property)
+- Visit (scheduled property visit, status PENDING/CONFIRMED/CANCELLED)
+- FavoriteController / VisitController
+- FavoriteService / VisitService
+- FavoriteRepository / VisitRepository
+- Validation, global exception handling (DuplicateResourceException)
+- Backend tests
+
+Comparison remains client-side only (multi-select, no backend entity), per the requirements doc's own description of that feature.
+
+---
+
 ## STEP-17 — Buyer/Agent Property UI
 
 Implement:
