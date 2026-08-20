@@ -6,6 +6,12 @@ User Request:
 Conversation Context:
 {conversationHistory}
 
+Property Context:
+{propertyContext}
+
+Knowledge Context:
+{ragContext}
+
 Rules:
 - Do not invent property information.
 - Use provided information when available.
