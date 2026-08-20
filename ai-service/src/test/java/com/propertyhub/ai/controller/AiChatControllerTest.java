@@ -34,7 +34,7 @@ class AiChatControllerTest {
         mockMvc.perform(post("/api/ai/chat")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"conversationId":1,"message":"Find me a 2 BHK in Pune under 80 lakh."}
+                                {"conversationId":1,"userId":5,"message":"Find me a 2 BHK in Pune under 80 lakh."}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.response").value("I found 3 matching properties."));
@@ -45,7 +45,18 @@ class AiChatControllerTest {
         mockMvc.perform(post("/api/ai/chat")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"message":""}
+                                {"userId":5,"message":""}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void returns400OnMissingUserId() throws Exception {
+        mockMvc.perform(post("/api/ai/chat")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"message":"Hello"}
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
@@ -60,7 +71,7 @@ class AiChatControllerTest {
         mockMvc.perform(post("/api/ai/requirements")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"message":"Find me a 2 BHK in Pune under 80 lakh with parking"}
+                                {"userId":5,"message":"Find me a 2 BHK in Pune under 80 lakh with parking"}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.city").value("Pune"))

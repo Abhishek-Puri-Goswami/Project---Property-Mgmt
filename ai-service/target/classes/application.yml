@@ -4,6 +4,17 @@ server:
 spring:
   application:
     name: ai-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/propertyhub_ai}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
