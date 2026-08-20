@@ -689,6 +689,14 @@ SUCCESS: Feature complete
 <One-sentence summary of what was implemented and validated.>
 ```
 
+Immediately after reporting SUCCESS, update `docs/vibe-coding/04-current-implementations.md`
+with a new dated entry for the completed STEP, at the same level of detail as
+the existing entries: objective, files created/modified, key design decisions,
+every issue hit during validation with its root cause and fix (not just the
+outcome), and the final validated result. This keeps that file a complete,
+self-contained implementation log that a fresh session with no conversation
+history can rely on.
+
 STOP.
 
 Do not automatically start the next STEP.

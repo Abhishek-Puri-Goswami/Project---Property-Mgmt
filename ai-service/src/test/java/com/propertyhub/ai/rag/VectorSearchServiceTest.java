@@ -1,6 +1,7 @@
 package com.propertyhub.ai.rag;
 
 import com.propertyhub.ai.dto.response.KnowledgeSearchResult;
+import com.propertyhub.ai.exception.VectorSearchException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,6 +64,24 @@ class VectorSearchServiceTest {
         List<KnowledgeSearchResult> results = service.searchForContext("Hello, how are you?");
 
         assertThat(results).isEmpty();
+    }
+
+    @Test
+    void searchThrowsVectorSearchExceptionWhenStoreFails() {
+        VectorSearchService service = new VectorSearchService(vectorStore);
+        when(vectorStore.similaritySearch(any(SearchRequest.class))).thenThrow(new RuntimeException("store unavailable"));
+
+        assertThatThrownBy(() -> service.search("query", 3))
+                .isInstanceOf(VectorSearchException.class);
+    }
+
+    @Test
+    void searchForContextThrowsVectorSearchExceptionWhenStoreFails() {
+        VectorSearchService service = new VectorSearchService(vectorStore);
+        when(vectorStore.similaritySearch(any(SearchRequest.class))).thenThrow(new RuntimeException("store unavailable"));
+
+        assertThatThrownBy(() -> service.searchForContext("query"))
+                .isInstanceOf(VectorSearchException.class);
     }
 
 }

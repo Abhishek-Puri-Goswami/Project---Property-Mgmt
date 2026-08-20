@@ -12,9 +12,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "chat_messages")
 public class ChatMessage {
@@ -37,9 +42,6 @@ public class ChatMessage {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    protected ChatMessage() {
-    }
-
     public ChatMessage(Conversation conversation, MessageRole role, String content) {
         this.conversation = conversation;
         this.role = role;
@@ -49,26 +51,6 @@ public class ChatMessage {
     @PrePersist
     void onCreate() {
         this.createdAt = LocalDateTime.now();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Conversation getConversation() {
-        return conversation;
-    }
-
-    public MessageRole getRole() {
-        return role;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
     }
 
 }

@@ -67,6 +67,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
 
+    @ExceptionHandler(VectorSearchException.class)
+    public ResponseEntity<ErrorResponse> handleVectorSearchException(VectorSearchException ex, HttpServletRequest request) {
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.BAD_GATEWAY.value(),
+                "VECTOR_SEARCH_ERROR",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(body);
+    }
+
     @ExceptionHandler(AiServiceException.class)
     public ResponseEntity<ErrorResponse> handleAiServiceException(AiServiceException ex, HttpServletRequest request) {
         ErrorResponse body = new ErrorResponse(

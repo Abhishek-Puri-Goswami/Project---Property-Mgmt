@@ -15,8 +15,7 @@ import com.propertyhub.ai.memory.ChatMemoryService;
 import com.propertyhub.ai.rag.VectorSearchService;
 import com.propertyhub.ai.repository.ChatMessageRepository;
 import com.propertyhub.ai.repository.ConversationRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
@@ -26,10 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class AiChatService {
 
-    private static final Logger log = LoggerFactory.getLogger(AiChatService.class);
     private static final int TITLE_MAX_LENGTH = 50;
     private static final String NONE = "(none)";
 

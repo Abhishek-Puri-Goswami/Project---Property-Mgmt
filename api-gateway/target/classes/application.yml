@@ -23,6 +23,8 @@ spring:
                 - Path=/api/ai/**
 
 eureka:
+  instance:
+    prefer-ip-address: true
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
@@ -31,4 +33,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics

@@ -1,19 +1,18 @@
 package com.propertyhub.ai.rag;
 
 import com.propertyhub.ai.dto.response.KnowledgeSearchResult;
-import com.propertyhub.ai.exception.AiServiceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.propertyhub.ai.exception.VectorSearchException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class VectorSearchService {
 
-    private static final Logger log = LoggerFactory.getLogger(VectorSearchService.class);
     private static final int RAG_TOP_K = 3;
     private static final double RAG_SIMILARITY_THRESHOLD = 0.5;
 
@@ -48,7 +47,7 @@ public class VectorSearchService {
                     .toList();
         } catch (Exception ex) {
             log.error("Vector search failed", ex);
-            throw new AiServiceException("Failed to search the knowledge base", ex);
+            throw new VectorSearchException("Failed to search the knowledge base", ex);
         }
     }
 
@@ -71,7 +70,7 @@ public class VectorSearchService {
                     .toList();
         } catch (Exception ex) {
             log.error("Vector search failed", ex);
-            throw new AiServiceException("Failed to search the knowledge base", ex);
+            throw new VectorSearchException("Failed to search the knowledge base", ex);
         }
     }
 

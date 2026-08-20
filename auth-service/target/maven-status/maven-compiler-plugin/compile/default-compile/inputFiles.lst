@@ -1,4 +1,5 @@
 D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\AuthServiceApplication.java
+D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\config\ModelMapperConfig.java
 D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\config\PasswordEncoderConfig.java
 D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\controller\AuthController.java
 D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\dto\request\LoginRequest.java

@@ -1,9 +1,8 @@
 package com.propertyhub.ai.rag;
 
 import com.propertyhub.ai.dto.response.IngestionResponse;
-import com.propertyhub.ai.exception.AiServiceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.propertyhub.ai.exception.VectorSearchException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.TextReader;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -14,10 +13,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class DocumentIngestionService {
-
-    private static final Logger log = LoggerFactory.getLogger(DocumentIngestionService.class);
 
     private static final String[] KNOWLEDGE_FILES = {
             "pune-locality-guide.md",
@@ -59,7 +57,7 @@ public class DocumentIngestionService {
             return new IngestionResponse(documents.size());
         } catch (Exception ex) {
             log.error("Document ingestion failed", ex);
-            throw new AiServiceException("Failed to ingest knowledge documents", ex);
+            throw new VectorSearchException("Failed to ingest knowledge documents", ex);
         }
     }
 

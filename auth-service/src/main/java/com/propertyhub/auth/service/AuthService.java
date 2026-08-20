@@ -9,24 +9,26 @@ import com.propertyhub.auth.exception.InvalidCredentialsException;
 import com.propertyhub.auth.exception.ResourceNotFoundException;
 import com.propertyhub.auth.exception.UserAlreadyExistsException;
 import com.propertyhub.auth.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class AuthService {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final ModelMapper modelMapper;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService,
+                        ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.modelMapper = modelMapper;
     }
 
     public UserResponse register(RegisterRequest request) {
@@ -71,7 +73,7 @@ public class AuthService {
     }
 
     private UserResponse toUserResponse(User user) {
-        return new UserResponse(user.getId(), user.getEmail(), user.getRole(), user.getCreatedAt());
+        return modelMapper.map(user, UserResponse.class);
     }
 
 }

@@ -12,5 +12,6 @@ com\propertyhub\property\dto\request\CreatePropertyRequest.class
 com\propertyhub\property\entity\PropertyType.class
 com\propertyhub\property\exception\InvalidSearchException.class
 com\propertyhub\property\service\PropertyService.class
+com\propertyhub\property\config\ModelMapperConfig.class
 com\propertyhub\property\exception\ErrorResponse.class
 com\propertyhub\property\dto\response\PropertyResponse.class

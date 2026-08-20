@@ -4,6 +4,7 @@ com\propertyhub\ai\dto\response\IngestionResponse.class
 com\propertyhub\ai\controller\AiChatController.class
 com\propertyhub\ai\rag\VectorSearchService.class
 com\propertyhub\ai\exception\ConversationNotFoundException.class
+com\propertyhub\ai\exception\VectorSearchException.class
 com\propertyhub\ai\rag\DocumentIngestionService.class
 com\propertyhub\ai\client\PropertyFeignClient.class
 com\propertyhub\ai\repository\ChatMessageRepository.class
@@ -29,4 +30,5 @@ com\propertyhub\ai\exception\ErrorResponse.class
 com\propertyhub\ai\exception\ForbiddenException.class
 com\propertyhub\ai\entity\ChatMessage.class
 com\propertyhub\ai\exception\AiServiceException.class
+com\propertyhub\ai\config\ModelMapperConfig.class
 com\propertyhub\ai\dto\response\ChatResponse.class

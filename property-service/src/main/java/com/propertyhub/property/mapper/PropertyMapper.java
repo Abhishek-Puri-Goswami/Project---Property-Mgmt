@@ -4,13 +4,19 @@ import com.propertyhub.property.dto.request.CreatePropertyRequest;
 import com.propertyhub.property.dto.response.PropertyResponse;
 import com.propertyhub.property.dto.response.PropertySummaryResponse;
 import com.propertyhub.property.entity.Property;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
 
-public final class PropertyMapper {
+@Component
+public class PropertyMapper {
 
-    private PropertyMapper() {
+    private final ModelMapper modelMapper;
+
+    public PropertyMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
     }
 
-    public static Property toEntity(CreatePropertyRequest request) {
+    public Property toEntity(CreatePropertyRequest request) {
         return new Property(
                 request.title(),
                 request.description(),
@@ -25,36 +31,12 @@ public final class PropertyMapper {
         );
     }
 
-    public static PropertyResponse toResponse(Property property) {
-        return new PropertyResponse(
-                property.getId(),
-                property.getTitle(),
-                property.getDescription(),
-                property.getCity(),
-                property.getPrice(),
-                property.getBhk(),
-                property.getArea(),
-                property.getPropertyType(),
-                property.getFurnishing(),
-                property.isParking(),
-                property.getAgentId(),
-                property.getCreatedAt(),
-                property.getUpdatedAt()
-        );
+    public PropertyResponse toResponse(Property property) {
+        return modelMapper.map(property, PropertyResponse.class);
     }
 
-    public static PropertySummaryResponse toSummary(Property property) {
-        return new PropertySummaryResponse(
-                property.getId(),
-                property.getTitle(),
-                property.getCity(),
-                property.getPrice(),
-                property.getBhk(),
-                property.getArea(),
-                property.getPropertyType(),
-                property.getFurnishing(),
-                property.isParking()
-        );
+    public PropertySummaryResponse toSummary(Property property) {
+        return modelMapper.map(property, PropertySummaryResponse.class);
     }
 
 }

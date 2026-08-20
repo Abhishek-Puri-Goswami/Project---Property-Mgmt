@@ -11,10 +11,15 @@ import jakarta.persistence.CheckConstraint;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "properties", check = {
         @CheckConstraint(name = "properties_price_positive", constraint = "price > 0"),
@@ -64,9 +69,6 @@ public class Property {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    protected Property() {
-    }
-
     public Property(String title, String description, String city, BigDecimal price, Integer bhk, BigDecimal area,
                      PropertyType propertyType, Furnishing furnishing, boolean parking, Long agentId) {
         this.title = title;
@@ -105,58 +107,6 @@ public class Property {
         this.furnishing = furnishing;
         this.parking = parking;
         this.agentId = agentId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public Integer getBhk() {
-        return bhk;
-    }
-
-    public BigDecimal getArea() {
-        return area;
-    }
-
-    public PropertyType getPropertyType() {
-        return propertyType;
-    }
-
-    public Furnishing getFurnishing() {
-        return furnishing;
-    }
-
-    public boolean isParking() {
-        return parking;
-    }
-
-    public Long getAgentId() {
-        return agentId;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 
 }

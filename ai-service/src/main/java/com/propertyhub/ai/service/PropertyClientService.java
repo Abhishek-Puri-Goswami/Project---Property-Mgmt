@@ -6,17 +6,15 @@ import com.propertyhub.ai.dto.PropertySummaryDto;
 import com.propertyhub.ai.exception.AiServiceException;
 import com.propertyhub.ai.exception.PropertyNotFoundException;
 import feign.FeignException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+@Slf4j
 @Service
 public class PropertyClientService {
-
-    private static final Logger log = LoggerFactory.getLogger(PropertyClientService.class);
 
     private final PropertyFeignClient propertyFeignClient;
 

@@ -16,5 +16,6 @@ com\propertyhub\auth\AuthServiceApplication.class
 com\propertyhub\auth\exception\InvalidCredentialsException.class
 com\propertyhub\auth\exception\ErrorResponse.class
 com\propertyhub\auth\exception\ResourceNotFoundException.class
+com\propertyhub\auth\config\ModelMapperConfig.class
 com\propertyhub\auth\repository\UserRepository.class
 com\propertyhub\auth\security\JwtAuthenticationEntryPoint.class

@@ -80,6 +80,17 @@ class AuthControllerTest {
     }
 
     @Test
+    void returns400OnInvalidRoleEnumValue() throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"buyer@example.com","password":"secret123","role":"NOPE"}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+    }
+
+    @Test
     void returns409OnDuplicateEmail() throws Exception {
         when(authService.register(any())).thenThrow(new UserAlreadyExistsException("A user with email 'buyer@example.com' already exists"));
 

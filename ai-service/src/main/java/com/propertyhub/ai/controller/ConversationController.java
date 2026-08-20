@@ -49,6 +49,9 @@ public class ConversationController {
     }
 
     private ChatMessageResponse toMessageResponse(ChatMessage message) {
+        // Kept manual: ChatMessageResponse.role() is a String while ChatMessage.role is an
+        // enum, and ModelMapper's RecordModule cannot bridge that type mismatch when
+        // matching the record's canonical constructor (confirmed via a live test failure).
         return new ChatMessageResponse(
                 message.getId(),
                 message.getRole().name(),

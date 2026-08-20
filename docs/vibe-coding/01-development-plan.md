@@ -390,6 +390,8 @@ Implement/complete across applicable services:
 - Swagger/OpenAPI
 - Spring Boot Admin registration
 - security restrictions for management endpoints
+- Switch to Lombok
+- ModelMapper Bean Approach
 
 Do not create centralized logging infrastructure.
 

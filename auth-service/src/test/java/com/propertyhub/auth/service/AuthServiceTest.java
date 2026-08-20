@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.record.RecordModule;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -37,11 +39,16 @@ class AuthServiceTest {
     @Mock
     private JwtService jwtService;
 
+    private final ModelMapper modelMapper = new ModelMapper();
     private AuthService authService;
+
+    {
+        modelMapper.registerModule(new RecordModule());
+    }
 
     @Test
     void registersUserWithEncodedPassword() {
-        authService = new AuthService(userRepository, passwordEncoder, jwtService);
+        authService = new AuthService(userRepository, passwordEncoder, jwtService, modelMapper);
         RegisterRequest request = new RegisterRequest("buyer@example.com", "secret123", Role.BUYER);
 
         when(userRepository.existsByEmail("buyer@example.com")).thenReturn(false);
@@ -63,7 +70,7 @@ class AuthServiceTest {
 
     @Test
     void throwsWhenEmailAlreadyRegistered() {
-        authService = new AuthService(userRepository, passwordEncoder, jwtService);
+        authService = new AuthService(userRepository, passwordEncoder, jwtService, modelMapper);
         RegisterRequest request = new RegisterRequest("buyer@example.com", "secret123", Role.BUYER);
 
         when(userRepository.existsByEmail("buyer@example.com")).thenReturn(true);
@@ -76,7 +83,7 @@ class AuthServiceTest {
 
     @Test
     void loginReturnsTokenOnValidCredentials() {
-        authService = new AuthService(userRepository, passwordEncoder, jwtService);
+        authService = new AuthService(userRepository, passwordEncoder, jwtService, modelMapper);
         User user = new User("buyer@example.com", "encoded-hash", Role.BUYER);
         LoginRequest request = new LoginRequest("buyer@example.com", "secret123");
 
@@ -93,7 +100,7 @@ class AuthServiceTest {
 
     @Test
     void throwsOnWrongPassword() {
-        authService = new AuthService(userRepository, passwordEncoder, jwtService);
+        authService = new AuthService(userRepository, passwordEncoder, jwtService, modelMapper);
         User user = new User("buyer@example.com", "encoded-hash", Role.BUYER);
         LoginRequest request = new LoginRequest("buyer@example.com", "wrong-password");
 
@@ -106,7 +113,7 @@ class AuthServiceTest {
 
     @Test
     void throwsOnUnknownEmail() {
-        authService = new AuthService(userRepository, passwordEncoder, jwtService);
+        authService = new AuthService(userRepository, passwordEncoder, jwtService, modelMapper);
         LoginRequest request = new LoginRequest("nobody@example.com", "secret123");
 
         when(userRepository.findByEmail("nobody@example.com")).thenReturn(Optional.empty());
@@ -117,7 +124,7 @@ class AuthServiceTest {
 
     @Test
     void getCurrentUserReturnsUserResponse() {
-        authService = new AuthService(userRepository, passwordEncoder, jwtService);
+        authService = new AuthService(userRepository, passwordEncoder, jwtService, modelMapper);
         User user = new User("buyer@example.com", "encoded-hash", Role.BUYER);
 
         when(userRepository.findByEmail("buyer@example.com")).thenReturn(Optional.of(user));
@@ -130,7 +137,7 @@ class AuthServiceTest {
 
     @Test
     void getCurrentUserThrowsWhenUserNotFound() {
-        authService = new AuthService(userRepository, passwordEncoder, jwtService);
+        authService = new AuthService(userRepository, passwordEncoder, jwtService, modelMapper);
 
         when(userRepository.findByEmail("nobody@example.com")).thenReturn(Optional.empty());
 

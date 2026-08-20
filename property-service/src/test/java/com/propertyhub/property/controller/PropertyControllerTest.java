@@ -96,6 +96,18 @@ class PropertyControllerTest {
     }
 
     @Test
+    void returns400OnInvalidPropertyTypeEnumValue() throws Exception {
+        mockMvc.perform(post("/api/properties")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"title":"2BHK in Hinjewadi","city":"Pune","price":7200000,"bhk":2,"area":1150,
+                                 "propertyType":"NOPE","furnishing":"SEMI_FURNISHED","parking":true,"agentId":1}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+    }
+
+    @Test
     void returns200OnGetFound() throws Exception {
         when(propertyService.get(1L)).thenReturn(sampleResponse());
 
