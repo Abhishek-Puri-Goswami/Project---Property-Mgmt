@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.propertyhub.ai.service.PropertyClientServiceTest" time="0.103" tests="5" errors="0" skipped="0" failures="0" flakes="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.propertyhub.ai.controller.AiChatControllerTest" time="1.752" tests="2" errors="0" skipped="0" failures="0" flakes="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -65,12 +65,31 @@
     <property name="java.class.version" value="65.0"/>
     <property name="LOGGED_APPLICATION_NAME" value="[ai-service] "/>
   </properties>
-  <testcase name="getPropertyThrowsAiServiceExceptionOnOtherFeignError" classname="com.propertyhub.ai.service.PropertyClientServiceTest" time="0.071">
-    <system-out><![CDATA[2026-08-20T08:07:41.313+05:30 ERROR 29204 --- [ai-service] [           main] c.p.ai.service.PropertyClientService     : Property service call failed
+  <testcase name="returns400OnBlankMessage" classname="com.propertyhub.ai.controller.AiChatControllerTest" time="0.764">
+    <system-out><![CDATA[2026-08-20T08:07:39.010+05:30  INFO 29204 --- [ai-service] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.propertyhub.ai.controller.AiChatControllerTest]: AiChatControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-20T08:07:39.056+05:30  INFO 29204 --- [ai-service] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.propertyhub.ai.AiServiceApplication for test class com.propertyhub.ai.controller.AiChatControllerTest
+2026-08-20T08:07:39.057+05:30  INFO 29204 --- [ai-service] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.propertyhub.ai.controller.AiChatControllerTest]: AiChatControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-20T08:07:39.069+05:30  INFO 29204 --- [ai-service] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.propertyhub.ai.AiServiceApplication for test class com.propertyhub.ai.controller.AiChatControllerTest
+2026-08-20T08:07:39.077+05:30  INFO 29204 --- [ai-service] [           main] o.s.c.n.e.s.EurekaServiceRegistry        : Unregistering application AI-SERVICE with eureka with status DOWN
+2026-08-20T08:07:39.077+05:30  INFO 29204 --- [ai-service] [           main] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1787193459077, current=DOWN, previous=UP]
+2026-08-20T08:07:39.077+05:30  INFO 29204 --- [ai-service] [foReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_AI-SERVICE/SuperAP.mshome.net:ai-service:8083: registering service...
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.0)
+
+2026-08-20T08:07:39.130+05:30  INFO 29204 --- [ai-service] [           main] c.p.ai.controller.AiChatControllerTest   : Starting AiChatControllerTest using Java 21.0.11 with PID 29204 (started by AP's_Lappy in D:\PropertyHub\ai-service)
+2026-08-20T08:07:39.130+05:30  INFO 29204 --- [ai-service] [           main] c.p.ai.controller.AiChatControllerTest   : No active profile set, falling back to 1 default profile: "default"
+2026-08-20T08:07:39.859+05:30  INFO 29204 --- [ai-service] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-20T08:07:39.860+05:30  INFO 29204 --- [ai-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-20T08:07:39.869+05:30  INFO 29204 --- [ai-service] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 4 ms
+2026-08-20T08:07:39.911+05:30  INFO 29204 --- [ai-service] [           main] c.p.ai.controller.AiChatControllerTest   : Started AiChatControllerTest in 0.831 seconds (process running for 7.968)
 ]]></system-out>
   </testcase>
-  <testcase name="getPropertiesByIdsReturnsResultsOnSuccess" classname="com.propertyhub.ai.service.PropertyClientServiceTest" time="0.016"/>
-  <testcase name="searchPropertiesReturnsResultsOnSuccess" classname="com.propertyhub.ai.service.PropertyClientServiceTest" time="0.002"/>
-  <testcase name="getPropertyThrowsPropertyNotFoundOn404" classname="com.propertyhub.ai.service.PropertyClientServiceTest" time="0.002"/>
-  <testcase name="getPropertyReturnsDtoOnSuccess" classname="com.propertyhub.ai.service.PropertyClientServiceTest" time="0.003"/>
+  <testcase name="returns200OnValidMessage" classname="com.propertyhub.ai.controller.AiChatControllerTest" time="0.058"/>
 </testsuite>

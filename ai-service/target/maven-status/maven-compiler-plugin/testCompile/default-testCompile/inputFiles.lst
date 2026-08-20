@@ -1,3 +1,5 @@
 D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\AiServiceApplicationTests.java
 D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\client\PropertyFeignClientLiveCheck.java
+D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\controller\AiChatControllerTest.java
+D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\service\AiChatServiceTest.java
 D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\service\PropertyClientServiceTest.java

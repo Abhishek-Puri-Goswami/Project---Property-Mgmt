@@ -1,3 +1,5 @@
 com\propertyhub\ai\AiServiceApplicationTests.class
-com\propertyhub\ai\client\PropertyFeignClientLiveCheck.class
+com\propertyhub\ai\controller\AiChatControllerTest.class
 com\propertyhub\ai\service\PropertyClientServiceTest.class
+com\propertyhub\ai\client\PropertyFeignClientLiveCheck.class
+com\propertyhub\ai\service\AiChatServiceTest.class

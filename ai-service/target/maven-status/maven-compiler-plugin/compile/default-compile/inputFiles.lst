@@ -1,9 +1,14 @@
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\AiServiceApplication.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\client\PropertyFeignClient.java
+D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\config\AiConfig.java
+D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\controller\AiChatController.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\dto\PropertyDto.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\dto\PropertySummaryDto.java
+D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\dto\request\ChatRequest.java
+D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\dto\response\ChatResponse.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\exception\AiServiceException.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\exception\ErrorResponse.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\exception\GlobalExceptionHandler.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\exception\PropertyNotFoundException.java
+D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\service\AiChatService.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\service\PropertyClientService.java
