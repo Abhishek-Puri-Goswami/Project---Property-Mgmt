@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.propertyhub.property.dto.response.PropertyResponse;
 import com.propertyhub.property.dto.response.PropertySummaryResponse;
 import com.propertyhub.property.entity.Furnishing;
+import com.propertyhub.property.entity.PropertyStatus;
 import com.propertyhub.property.entity.PropertyType;
 import com.propertyhub.property.exception.InvalidSearchException;
 import com.propertyhub.property.exception.ResourceNotFoundException;
@@ -47,7 +48,7 @@ class PropertyControllerTest {
         return new PropertyResponse(
                 1L, "2BHK in Hinjewadi", "Spacious flat", "Pune",
                 new BigDecimal("7200000"), 2, new BigDecimal("1150"),
-                PropertyType.APARTMENT, Furnishing.SEMI_FURNISHED, true, 1L,
+                PropertyType.APARTMENT, Furnishing.SEMI_FURNISHED, true, 1L, PropertyStatus.ACTIVE,
                 LocalDateTime.now(), LocalDateTime.now()
         );
     }
@@ -166,7 +167,7 @@ class PropertyControllerTest {
     void returns200OnSearchWithFilters() throws Exception {
         PropertySummaryResponse summary = new PropertySummaryResponse(
                 1L, "2BHK in Hinjewadi", "Pune", new BigDecimal("7200000"), 2,
-                new BigDecimal("1150"), PropertyType.APARTMENT, Furnishing.SEMI_FURNISHED, true
+                new BigDecimal("1150"), PropertyType.APARTMENT, Furnishing.SEMI_FURNISHED, true, PropertyStatus.ACTIVE
         );
         when(propertyService.search(eq("Pune"), eq(2), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(List.of(summary));
@@ -190,13 +191,42 @@ class PropertyControllerTest {
     void returns200OnGetByIds() throws Exception {
         PropertySummaryResponse summary = new PropertySummaryResponse(
                 1L, "2BHK in Hinjewadi", "Pune", new BigDecimal("7200000"), 2,
-                new BigDecimal("1150"), PropertyType.APARTMENT, Furnishing.SEMI_FURNISHED, true
+                new BigDecimal("1150"), PropertyType.APARTMENT, Furnishing.SEMI_FURNISHED, true, PropertyStatus.ACTIVE
         );
         when(propertyService.getByIds(List.of(1L, 2L))).thenReturn(List.of(summary));
 
         mockMvc.perform(get("/api/properties/batch").param("ids", "1", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1));
+    }
+
+    @Test
+    void returns200OnAdminListing() throws Exception {
+        PropertySummaryResponse summary = new PropertySummaryResponse(
+                1L, "2BHK in Hinjewadi", "Pune", new BigDecimal("7200000"), 2,
+                new BigDecimal("1150"), PropertyType.APARTMENT, Furnishing.SEMI_FURNISHED, true, PropertyStatus.PENDING
+        );
+        when(propertyService.listAllForAdmin()).thenReturn(List.of(summary));
+
+        mockMvc.perform(get("/api/properties/admin"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].status").value("PENDING"));
+    }
+
+    @Test
+    void returns200OnApprove() throws Exception {
+        when(propertyService.approve(1L)).thenReturn(sampleResponse());
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch("/api/properties/1/approve"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void returns404OnApproveMissingProperty() throws Exception {
+        when(propertyService.approve(99L)).thenThrow(new ResourceNotFoundException("Property with id 99 was not found"));
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch("/api/properties/99/approve"))
+                .andExpect(status().isNotFound());
     }
 
 }

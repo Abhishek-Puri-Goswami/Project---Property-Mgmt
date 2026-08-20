@@ -63,6 +63,10 @@ public class Property {
     @Column(name = "agent_id", nullable = false)
     private Long agentId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PropertyStatus status;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -81,6 +85,11 @@ public class Property {
         this.furnishing = furnishing;
         this.parking = parking;
         this.agentId = agentId;
+        this.status = PropertyStatus.PENDING;
+    }
+
+    public void approve() {
+        this.status = PropertyStatus.ACTIVE;
     }
 
     @PrePersist

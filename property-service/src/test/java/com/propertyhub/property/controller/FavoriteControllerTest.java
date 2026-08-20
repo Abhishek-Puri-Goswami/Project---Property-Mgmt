@@ -3,6 +3,7 @@ package com.propertyhub.property.controller;
 import com.propertyhub.property.dto.response.FavoriteResponse;
 import com.propertyhub.property.dto.response.PropertySummaryResponse;
 import com.propertyhub.property.entity.Furnishing;
+import com.propertyhub.property.entity.PropertyStatus;
 import com.propertyhub.property.entity.PropertyType;
 import com.propertyhub.property.exception.DuplicateResourceException;
 import com.propertyhub.property.exception.ResourceNotFoundException;
@@ -37,7 +38,7 @@ class FavoriteControllerTest {
 
     private PropertySummaryResponse sampleSummary() {
         return new PropertySummaryResponse(1L, "2BHK in Hinjewadi", "Pune", new BigDecimal("7200000"), 2,
-                new BigDecimal("1150"), PropertyType.APARTMENT, Furnishing.SEMI_FURNISHED, true);
+                new BigDecimal("1150"), PropertyType.APARTMENT, Furnishing.SEMI_FURNISHED, true, PropertyStatus.ACTIVE);
     }
 
     @Test

@@ -1,3 +1,5 @@
+com\propertyhub\ai\service\AdminAiServiceTest.class
+com\propertyhub\ai\controller\AdminAiControllerTest.class
 com\propertyhub\ai\client\PropertyFeignClientLiveCheck.class
 com\propertyhub\ai\controller\ConversationControllerTest.class
 com\propertyhub\ai\rag\VectorSearchServiceTest.class

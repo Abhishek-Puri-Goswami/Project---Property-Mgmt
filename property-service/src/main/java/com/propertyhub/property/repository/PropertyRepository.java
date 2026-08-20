@@ -14,7 +14,8 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     @Query("""
             SELECT p FROM Property p
-            WHERE (:city IS NULL OR LOWER(p.city) = LOWER(CAST(:city AS string)))
+            WHERE p.status = com.propertyhub.property.entity.PropertyStatus.ACTIVE
+              AND (:city IS NULL OR LOWER(p.city) = LOWER(CAST(:city AS string)))
               AND (:bhk IS NULL OR p.bhk = :bhk)
               AND (:minPrice IS NULL OR p.price >= :minPrice)
               AND (:maxPrice IS NULL OR p.price <= :maxPrice)

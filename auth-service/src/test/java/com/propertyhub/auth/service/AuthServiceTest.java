@@ -18,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.record.RecordModule;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -133,6 +134,21 @@ class AuthServiceTest {
 
         assertThat(response.email()).isEqualTo("buyer@example.com");
         assertThat(response.role()).isEqualTo(Role.BUYER);
+    }
+
+    @Test
+    void listUsersReturnsAllUsers() {
+        authService = new AuthService(userRepository, passwordEncoder, jwtService, modelMapper);
+        User buyer = new User("buyer@example.com", "encoded-hash", Role.BUYER);
+        User agent = new User("agent@example.com", "encoded-hash", Role.AGENT);
+
+        when(userRepository.findAll()).thenReturn(List.of(buyer, agent));
+
+        List<UserResponse> results = authService.listUsers();
+
+        assertThat(results).hasSize(2);
+        assertThat(results.get(0).email()).isEqualTo("buyer@example.com");
+        assertThat(results.get(1).role()).isEqualTo(Role.AGENT);
     }
 
     @Test

@@ -14,6 +14,7 @@ D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\exception\Invalid
 D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\exception\ResourceNotFoundException.java
 D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\exception\UserAlreadyExistsException.java
 D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\repository\UserRepository.java
+D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\security\JwtAccessDeniedHandler.java
 D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\security\JwtAuthenticationEntryPoint.java
 D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\security\JwtAuthenticationFilter.java
 D:\PropertyHub\auth-service\src\main\java\com\propertyhub\auth\security\SecurityConfig.java

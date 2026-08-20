@@ -103,6 +103,19 @@ public class PropertyService {
                 .toList();
     }
 
+    public List<PropertySummaryResponse> listAllForAdmin() {
+        return propertyRepository.findAll().stream()
+                .map(propertyMapper::toSummary)
+                .toList();
+    }
+
+    @Transactional
+    public PropertyResponse approve(Long id) {
+        Property property = findOrThrow(id);
+        property.approve();
+        return propertyMapper.toResponse(property);
+    }
+
     private void validateSearchParams(Integer bhk, BigDecimal minPrice, BigDecimal maxPrice,
                                        BigDecimal minArea, BigDecimal maxArea) {
         if (bhk != null && bhk <= 0) {

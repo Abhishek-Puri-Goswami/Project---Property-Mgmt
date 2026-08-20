@@ -511,6 +511,20 @@ AI uses previous context
 
 ---
 
+## STEP-19A — Admin Backend Support
+
+**Inserted STEP, not part of the original plan sequence.** Added after STEP-19 planning revealed that the Admin Panel's actual requirements (§51–54: user/agent counts and listing, property status + approve action, AI conversation analytics) had no backing endpoints — only Property CRUD/search and Conversation get-by-id existed. Inserted ahead of STEP-19 so it can build against real data, per explicit user decision (see `04-current-implementations.md` for the full record, including the accepted behavior change: new properties now default to `PENDING` and require admin approval before appearing in buyer search).
+
+Implement:
+
+- auth-service: `GET /api/auth/users` (ADMIN-only)
+- property-service: `Property.status` (ACTIVE/PENDING), `GET /api/properties/admin`, `PATCH /api/properties/{id}/approve`
+- ai-service: `GET /api/ai/conversations`, `GET /api/ai/analytics`
+
+"RAG Queries" and "Tool Calls" metrics intentionally omitted — no tracking exists for either, and Tool Calling itself is an unbuilt optional feature (STEP-O1).
+
+---
+
 ## STEP-19 — Admin Panel
 
 Create a separate React + Vite application.

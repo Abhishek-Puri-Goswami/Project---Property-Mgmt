@@ -12,6 +12,7 @@ com\propertyhub\auth\dto\request\LoginRequest.class
 com\propertyhub\auth\exception\GlobalExceptionHandler.class
 com\propertyhub\auth\dto\response\UserResponse.class
 com\propertyhub\auth\dto\request\RegisterRequest.class
+com\propertyhub\auth\security\JwtAccessDeniedHandler.class
 com\propertyhub\auth\AuthServiceApplication.class
 com\propertyhub\auth\exception\InvalidCredentialsException.class
 com\propertyhub\auth\exception\ErrorResponse.class

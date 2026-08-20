@@ -14,6 +14,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class AuthService {
@@ -70,6 +72,12 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return toUserResponse(user);
+    }
+
+    public List<UserResponse> listUsers() {
+        return userRepository.findAll().stream()
+                .map(this::toUserResponse)
+                .toList();
     }
 
     private UserResponse toUserResponse(User user) {

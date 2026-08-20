@@ -12,6 +12,7 @@ D:\PropertyHub\property-service\src\main\java\com\propertyhub\property\dto\respo
 D:\PropertyHub\property-service\src\main\java\com\propertyhub\property\entity\Favorite.java
 D:\PropertyHub\property-service\src\main\java\com\propertyhub\property\entity\Furnishing.java
 D:\PropertyHub\property-service\src\main\java\com\propertyhub\property\entity\Property.java
+D:\PropertyHub\property-service\src\main\java\com\propertyhub\property\entity\PropertyStatus.java
 D:\PropertyHub\property-service\src\main\java\com\propertyhub\property\entity\PropertyType.java
 D:\PropertyHub\property-service\src\main\java\com\propertyhub\property\entity\Visit.java
 D:\PropertyHub\property-service\src\main\java\com\propertyhub\property\entity\VisitStatus.java

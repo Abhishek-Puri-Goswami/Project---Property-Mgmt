@@ -1,5 +1,6 @@
 com\propertyhub\property\entity\Favorite.class
 com\propertyhub\property\controller\PropertyController.class
+com\propertyhub\property\entity\PropertyStatus.class
 com\propertyhub\property\dto\request\UpdatePropertyRequest.class
 com\propertyhub\property\entity\Visit.class
 com\propertyhub\property\entity\Property.class

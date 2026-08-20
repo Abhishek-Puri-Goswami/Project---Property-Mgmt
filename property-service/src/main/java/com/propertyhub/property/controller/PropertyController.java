@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -53,6 +54,16 @@ public class PropertyController {
     @GetMapping("/batch")
     public ResponseEntity<List<PropertySummaryResponse>> getByIds(@RequestParam List<Long> ids) {
         return ResponseEntity.ok(propertyService.getByIds(ids));
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<List<PropertySummaryResponse>> listAllForAdmin() {
+        return ResponseEntity.ok(propertyService.listAllForAdmin());
+    }
+
+    @PatchMapping("/{id}/approve")
+    public ResponseEntity<PropertyResponse> approve(@PathVariable Long id) {
+        return ResponseEntity.ok(propertyService.approve(id));
     }
 
     @PostMapping

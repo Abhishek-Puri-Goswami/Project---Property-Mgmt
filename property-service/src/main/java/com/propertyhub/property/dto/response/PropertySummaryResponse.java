@@ -1,6 +1,7 @@
 package com.propertyhub.property.dto.response;
 
 import com.propertyhub.property.entity.Furnishing;
+import com.propertyhub.property.entity.PropertyStatus;
 import com.propertyhub.property.entity.PropertyType;
 
 import java.math.BigDecimal;
@@ -15,7 +16,8 @@ public record PropertySummaryResponse(
         BigDecimal area,
         PropertyType propertyType,
         Furnishing furnishing,
-        boolean parking
+        boolean parking,
+        PropertyStatus status
 
 ) {
 }

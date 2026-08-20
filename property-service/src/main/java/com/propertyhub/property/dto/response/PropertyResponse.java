@@ -1,6 +1,7 @@
 package com.propertyhub.property.dto.response;
 
 import com.propertyhub.property.entity.Furnishing;
+import com.propertyhub.property.entity.PropertyStatus;
 import com.propertyhub.property.entity.PropertyType;
 
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ public record PropertyResponse(
         Furnishing furnishing,
         boolean parking,
         Long agentId,
+        PropertyStatus status,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 

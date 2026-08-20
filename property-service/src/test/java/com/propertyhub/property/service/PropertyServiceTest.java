@@ -82,6 +82,48 @@ class PropertyServiceTest {
     }
 
     @Test
+    void createDefaultsToPendingStatus() {
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
+        when(propertyRepository.save(any(Property.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        PropertyResponse response = propertyService.create(createRequest());
+
+        assertThat(response.status()).isEqualTo(com.propertyhub.property.entity.PropertyStatus.PENDING);
+    }
+
+    @Test
+    void approveSetsStatusToActive() {
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
+        Property property = existingProperty();
+        when(propertyRepository.findById(1L)).thenReturn(Optional.of(property));
+
+        PropertyResponse response = propertyService.approve(1L);
+
+        assertThat(response.status()).isEqualTo(com.propertyhub.property.entity.PropertyStatus.ACTIVE);
+    }
+
+    @Test
+    void approveThrowsWhenNotFound() {
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
+        when(propertyRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> propertyService.approve(99L))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void listAllForAdminReturnsAllProperties() {
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
+        Property property = existingProperty();
+        when(propertyRepository.findAll()).thenReturn(List.of(property));
+
+        List<PropertySummaryResponse> results = propertyService.listAllForAdmin();
+
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0).status()).isEqualTo(com.propertyhub.property.entity.PropertyStatus.PENDING);
+    }
+
+    @Test
     void getReturnsPropertyWhenFound() {
         propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
         Property property = existingProperty();

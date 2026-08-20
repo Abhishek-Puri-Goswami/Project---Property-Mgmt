@@ -1,4 +1,4 @@
-# PropertyHub — Current Implementation Log (STEP-01 through STEP-18)
+# PropertyHub — Current Implementation Log (STEP-01 through STEP-19A)
 
 ## Purpose
 
@@ -542,16 +542,46 @@ feign-okhttp                 (version managed by Spring Cloud BOM)
 
 ---
 
+## STEP-19A — Admin Backend Support (Users, Property Status/Approval, AI Analytics)
+
+**Not part of the original `01-development-plan.md` sequence — inserted between STEP-18 and STEP-19.** While planning STEP-19 (Admin Panel), live inspection found that the requirements doc's Admin Dashboard (§51–54: Total Users/Agents/Properties/AI Conversations, Recent Users/Properties tables, property Active/Pending status + Approve action, AI Analytics) had no backing endpoints. Two `AskUserQuestion` decisions were made before planning: (1) insert a dedicated backend STEP first (same pattern as STEP-16A), and (2) omit the requirements doc's "RAG Queries"/"Tool Calls" AI metrics entirely rather than fabricate numbers, since no tracking exists for either and Tool Calling itself is an unbuilt optional feature (STEP-O1).
+
+**Design decision (stated in the plan, flagged prominently for approval — a real behavior change to existing STEP-06/17 flow):** to make the Admin mockup's Active/Pending status and Approve action meaningful, new properties now default to `status: PENDING` instead of being immediately live, and the existing buyer-facing `GET /api/properties` search now only returns `ACTIVE` properties. An agent's newly created property no longer appears in buyer search until an admin approves it.
+
+**Created:**
+- `property-service/.../entity/PropertyStatus.java` — enum `ACTIVE`, `PENDING`.
+- `ai-service/.../dto/response/{ConversationSummaryResponse,AiAnalyticsResponse}.java`.
+- `ai-service/.../controller/AdminAiController.java`, `.../service/AdminAiService.java` — `GET /api/ai/conversations`, `GET /api/ai/analytics`.
+- Tests: `AdminAiServiceTest`, `AdminAiControllerTest`, plus additions to `AuthServiceTest`, `PropertyServiceTest`, `PropertyControllerTest`.
+
+**Modified:**
+- **auth-service**: `AuthController` (+`GET /api/auth/users`), `AuthService` (+`listUsers()`), `SecurityConfig` (`/api/auth/users` restricted to `hasRole("ADMIN")` — the one service with real RBAC infrastructure from STEP-05, so this was straightforward, unlike the other two services' known open security gap).
+- **property-service**: `Property` entity (+`status`, defaults `PENDING` in the constructor; +`approve()`), `PropertyResponse`/`PropertySummaryResponse` (+`status`), `PropertyRepository.search()` (JPQL gets a fixed `AND p.status = ACTIVE` clause, no signature change), `PropertyService` (+`listAllForAdmin()`, +`approve()`), `PropertyController` (+`GET /api/properties/admin`, +`PATCH /api/properties/{id}/approve`).
+- **ai-service**: `ChatMessageRepository` (+`countByConversation`).
+
+New admin endpoints in property-service/ai-service were deliberately left **unsecured**, consistent with those services' already-flagged, not-yet-resolved security gap — adding role checks to only these endpoints would be exactly the "piecemeal security" `CLAUDE.md` warns against.
+
+**Issues & fixes (two real defects found during live validation, both fixed with explicit user approval):**
+
+1. **Wrong HTTP status/shape on role-restricted access.** A valid BUYER token hitting `/api/auth/users` returned `401 UNAUTHORIZED` with `path: "/error"` instead of `403 FORBIDDEN` with the real path. Root cause: `SecurityConfig` wired an `authenticationEntryPoint` (for unauthenticated requests) but no `accessDeniedHandler` (for authenticated-but-wrong-role requests) — Spring's default `AccessDeniedException` handling fell through to the servlet's `/error` dispatch, which re-entered the security chain and got caught by the entry point instead. **Fix:** added `JwtAccessDeniedHandler` (same `ErrorResponse` shape as `JwtAuthenticationEntryPoint`, `403 FORBIDDEN`), wired via `.exceptionHandling(eh -> eh.authenticationEntryPoint(...).accessDeniedHandler(...))`.
+2. **`ddl-auto=update` failed to add the new `status` column.** `properties` table wasn't actually empty (leftover curl-seeded test data from STEP-17/18 live-validation sessions), and Postgres refuses to add a `NOT NULL` column to a table with existing rows — the migration silently failed, leaving every query referencing `status` broken (`column "status" does not exist`). Same category of issue as STEP-06's original constraint-migration problem. **Fix:** dropped and recreated `propertyhub_property` (disposable test data only), then restarted property-service so `ddl-auto=update` built the schema fresh with `status` included.
+3. **Lesson for future STEPs:** when adding a new `NOT NULL` column via `ddl-auto=update`, never assume a dev-environment table is empty just because no STEP intentionally seeded persistent data — prior live-validation sessions leave rows behind. Check the actual table contents (or plan for a drop/recreate) before relying on an additive schema change.
+
+**Validation result:** `mvn clean verify` (JDK 21) → auth-service 23/23, property-service 58/58, ai-service 40/40, all BUILD SUCCESS. Live, all 5 services running: `/api/auth/users` correctly returned `401` (no token) → `403 FORBIDDEN` with the real path (BUYER token, after the fix) → `200` with the full user list (ADMIN token); a newly created property came back `PENDING` and was absent from `GET /api/properties` but present in `/api/properties/admin`; `PATCH /api/properties/1/approve` flipped it to `ACTIVE` and it then appeared in buyer search; `/api/ai/conversations` and `/api/ai/analytics` returned accurate per-conversation message counts and totals (3 conversations, 10 messages) matching real seeded data from STEP-18's live validation.
+
+---
+
 # 5. Known Open Items / Gaps (not yet resolved, intentionally flagged)
 
-1. **Security gap:** `property-service`, `ai-service`, `api-gateway` have no authentication on their business endpoints. Only `auth-service` has JWT/Spring Security. This needs a dedicated future STEP — do not patch piecemeal.
+1. **Security gap:** `property-service`, `ai-service`, `api-gateway` have no authentication on their business endpoints (except the new STEP-19A auth-service admin endpoint and the pre-existing auth-service endpoints). Only `auth-service` has JWT/Spring Security. This needs a dedicated future STEP — do not patch piecemeal.
 2. **Actuator endpoints are fully open (whitelist of `health,info,metrics`, not authenticated)** on all services except that auth-service's JWT filter explicitly permits them — this is linked to item 1 above; proper actuator security requires the broader security rollout first.
 3. Property Service's `agentId`, `Favorite`/`Visit`'s `userId`, and AI Service's `userId` are all supplied directly in request bodies/params (no JWT-derived identity) — will need to change once security is added everywhere.
 4. **Node/jsdom `localStorage` collision** on this machine's Node 25 runtime — permanently worked around via `cross-env NODE_OPTIONS=--no-experimental-webstorage` in the frontend's `test`/`test:ui` npm scripts (see STEP-16). Do not remove that env override from future script changes without confirming the underlying Node behavior has changed.
 5. Agent property management has no dedicated "My Properties" filtered list — `PropertySummaryResponse` lacks `agentId`. Agents currently browse the full unfiltered Search page and can only Edit/Delete from Property Details when they own the property. Acceptable for MVP simplicity (see STEP-17's scope decision); revisit if a filtered list becomes a real requirement.
+6. **"RAG Queries" and "Tool Calls" AI Analytics metrics are permanently omitted from the Admin Panel** (see STEP-19A) — no tracking exists for either, and Tool Calling itself is unbuilt (optional STEP-O1). If Tool Calling is ever implemented, revisit adding real tracking for these.
 
 ---
 
 # 6. Next STEP
 
-Per `01-development-plan.md`: **STEP-19 — Admin Panel** (separate React + Vite application: Admin Dashboard, Users, Agents, Properties, Property Approval/Removal, Statistics, AI Usage Overview, System/Service Status — Axios, Claymorphism, role-aware UI, loading/empty/error states, timeout toasts). Not started as of this document's writing. Do not begin it automatically — wait for explicit user instruction, per `CLAUDE.md`'s lifecycle rules.
+Per `01-development-plan.md`: **STEP-19 — Admin Panel** (separate React + Vite application: Admin Dashboard, Users, Agents, Properties, Property Approval/Removal, Statistics, AI Usage Overview, System/Service Status — Axios, Claymorphism, role-aware UI, loading/empty/error states, timeout toasts). Real backend data is now available per STEP-19A. Not started as of this document's writing. Do not begin it automatically — wait for explicit user instruction, per `CLAUDE.md`'s lifecycle rules.
