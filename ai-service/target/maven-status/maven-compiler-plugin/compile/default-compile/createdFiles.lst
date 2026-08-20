@@ -1,3 +1,4 @@
+com\propertyhub\ai\dto\response\PropertyRequirementResponse.class
 com\propertyhub\ai\config\AiConfig.class
 com\propertyhub\ai\dto\PropertySummaryDto.class
 com\propertyhub\ai\controller\AiChatController.class
@@ -8,6 +9,7 @@ com\propertyhub\ai\service\PropertyClientService.class
 com\propertyhub\ai\exception\GlobalExceptionHandler.class
 com\propertyhub\ai\exception\ErrorResponse.class
 com\propertyhub\ai\dto\request\ChatRequest.class
+com\propertyhub\ai\prompt\PromptConfig.class
 com\propertyhub\ai\AiServiceApplication.class
 com\propertyhub\ai\exception\AiServiceException.class
 com\propertyhub\ai\service\AiChatService.class

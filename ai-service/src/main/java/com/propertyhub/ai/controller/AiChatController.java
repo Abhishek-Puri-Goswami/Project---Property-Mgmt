@@ -2,6 +2,7 @@ package com.propertyhub.ai.controller;
 
 import com.propertyhub.ai.dto.request.ChatRequest;
 import com.propertyhub.ai.dto.response.ChatResponse;
+import com.propertyhub.ai.dto.response.PropertyRequirementResponse;
 import com.propertyhub.ai.service.AiChatService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,11 @@ public class AiChatController {
     @PostMapping("/chat")
     public ResponseEntity<ChatResponse> chat(@Valid @RequestBody ChatRequest request) {
         return ResponseEntity.ok(aiChatService.chat(request));
+    }
+
+    @PostMapping("/requirements")
+    public ResponseEntity<PropertyRequirementResponse> extractRequirement(@Valid @RequestBody ChatRequest request) {
+        return ResponseEntity.ok(aiChatService.extractRequirement(request));
     }
 
 }
