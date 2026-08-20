@@ -1,4 +1,4 @@
-# PropertyHub — Current Implementation Log (STEP-01 through STEP-16A)
+# PropertyHub — Current Implementation Log (STEP-01 through STEP-17)
 
 ## Purpose
 
@@ -494,15 +494,42 @@ feign-okhttp                 (version managed by Spring Cloud BOM)
 
 ---
 
+## STEP-17 — Buyer/Agent Property UI
+
+**Objective (per `01-development-plan.md`):** wire the STEP-16 scaffolding to real backend data — Login, Register, Dashboard, Property Search, Property Details, Favorites, Comparison, Scheduled Visits, and the Ask AI entry point (full chat UI is STEP-18). Mirror backend validation, use Axios, display API errors cleanly, use success/error toasts.
+
+**Scope decision (stated in the plan, not silent):** Agent property management (create/edit/delete) was folded into existing screens rather than a dedicated "My Properties" list screen — `PropertySummaryResponse` has no `agentId` field, so a filtered "my listings" view wasn't cheaply buildable without a backend change. Agents create properties from the Dashboard; Edit/Delete appear on Property Details only when `property.agentId === user.id` (the full `PropertyResponse` does carry `agentId`). This covers the Agent capabilities in `00-project-requirements.md` without a mid-frontend-STEP backend change.
+
+**Created (frontend):**
+- `api/{authApi,propertyApi}.js` — thin Axios wrappers for every auth/property/favorite/visit endpoint.
+- `validation/{authValidation,propertyValidation}.js` — mirrors backend Bean Validation rules exactly (email format, password min length, positive price/bhk/area, required enums, future-dated visits).
+- `context/ComparisonContext.jsx` — selected property IDs, capped at 4, persisted to `localStorage`.
+- `components/property/{PropertyCard,PropertyForm,ScheduleVisitModal}.jsx` — domain-specific components (kept separate from `components/common/`, which stays generic).
+- Full test suite: `authValidation.test.js`, `propertyValidation.test.js`, `ComparisonContext.test.jsx`, `LoginPage.test.jsx`, `RegisterPage.test.jsx`, `PropertySearchPage.test.jsx`, `PropertyDetailsPage.test.jsx`, `FavoritesPage.test.jsx`, `VisitsPage.test.jsx`, `ScheduleVisitModal.test.jsx` — 37 new tests (54 total with STEP-16's 17).
+
+**Modified (frontend):** all nine STEP-16 placeholder pages replaced with real implementations (see plan for per-page detail); `App.jsx` wrapped with `ComparisonProvider`.
+
+**Issues & fixes (two real property-service bugs found during live validation, both fixed with explicit user approval — not silently patched):**
+
+1. **Property updates never persisted.** `PUT /api/properties/{id}` returned `200` with the *correct* updated body, but a subsequent `GET` showed the old values and `updatedAt` never advanced. Root cause: `PropertyService.update()` mutated the entity fetched via `findOrThrow()` but was never `@Transactional` and never called `save()` — `findById()` runs in its own short-lived read-only transaction that commits and closes before the mutation happens, so Hibernate's dirty-checking never got a chance to flush. This bug has existed since STEP-06 and was never caught because STEP-06's original validation checked only the immediate PUT response, not a follow-up GET. **Fix:** added `@Transactional` to `PropertyService.update()` (and `delete()`, for consistency).
+2. **Deleting a favorited/visited property failed with 500.** `org.postgresql.util.PSQLException: ERROR: update or delete on table "properties" violates foreign key constraint "fkd1rhumcrlv6g55lt8eprudthc" on table "favorites"`. Root cause: STEP-16A added `Favorite`/`Visit` with a `@ManyToOne` FK to `Property` but no cascade-delete handling. **Fix:** `PropertyService.delete()` now deletes the property's `Favorite`/`Visit` rows first (new `FavoriteRepository.deleteByPropertyId`/`VisitRepository.deleteByPropertyId` derived-query methods) before deleting the `Property`, all inside one `@Transactional` method. `PropertyServiceTest` updated (new `@Mock` `FavoriteRepository`/`VisitRepository`, constructor signature changed, `deleteRemovesExistingProperty` now asserts both cascade calls).
+
+**Lesson for future STEPs:** an endpoint returning the "correct-looking" response body is not proof of persistence — always verify a write with a separate follow-up read when validating CRUD endpoints live, not just the write's own response.
+
+**Validation result:** `npm run build` → clean production build (125 modules). `npm run test` → 54/54 passing across 17 files. `property-service` `mvn clean verify` (JDK 21, after the two fixes) → BUILD SUCCESS, 51/51 tests. Live, full walkthrough against all real running services (eureka, gateway, auth, property): registered a buyer and an agent, logged in as each, agent created a property from the Dashboard, buyer searched and found it, favorited it (confirmed on the Favorites page), added it to Comparison (confirmed on the Comparison page), scheduled a visit (confirmed on the Visits page, role-aware fetch verified for both BUYER and AGENT), agent edited the property (confirmed the fix — change persisted across a fresh fetch) and deleted it (confirmed the fix — no FK violation, property gone from search).
+
+---
+
 # 5. Known Open Items / Gaps (not yet resolved, intentionally flagged)
 
 1. **Security gap:** `property-service`, `ai-service`, `api-gateway` have no authentication on their business endpoints. Only `auth-service` has JWT/Spring Security. This needs a dedicated future STEP — do not patch piecemeal.
 2. **Actuator endpoints are fully open (whitelist of `health,info,metrics`, not authenticated)** on all services except that auth-service's JWT filter explicitly permits them — this is linked to item 1 above; proper actuator security requires the broader security rollout first.
 3. Property Service's `agentId`, `Favorite`/`Visit`'s `userId`, and AI Service's `userId` are all supplied directly in request bodies/params (no JWT-derived identity) — will need to change once security is added everywhere.
 4. **Node/jsdom `localStorage` collision** on this machine's Node 25 runtime — permanently worked around via `cross-env NODE_OPTIONS=--no-experimental-webstorage` in the frontend's `test`/`test:ui` npm scripts (see STEP-16). Do not remove that env override from future script changes without confirming the underlying Node behavior has changed.
+5. Agent property management has no dedicated "My Properties" filtered list — `PropertySummaryResponse` lacks `agentId`. Agents currently browse the full unfiltered Search page and can only Edit/Delete from Property Details when they own the property. Acceptable for MVP simplicity (see STEP-17's scope decision); revisit if a filtered list becomes a real requirement.
 
 ---
 
 # 6. Next STEP
 
-Per `01-development-plan.md`: **STEP-17 — Buyer/Agent Property UI** (Login, Register, Dashboard, Property Search, Property Details, Favorites, Comparison, Scheduled Visits, Ask AI entry point — real forms/data wired via Axios into the STEP-16 scaffolding, mirroring backend validation, using success/error toasts). Favorites and Visits can now be wired to real backend endpoints per STEP-16A. Not started as of this document's writing. Do not begin it automatically — wait for explicit user instruction, per `CLAUDE.md`'s lifecycle rules.
+Per `01-development-plan.md`: **STEP-18 — AI Copilot UI** (conversation layout, message history, prompt input, loading indicator, structured recommendation display, property result cards, follow-up conversation support, failure toast, empty state — the full AI chat UI, building on STEP-17's `AiCopilotPage` entry point). Not started as of this document's writing. Do not begin it automatically — wait for explicit user instruction, per `CLAUDE.md`'s lifecycle rules.

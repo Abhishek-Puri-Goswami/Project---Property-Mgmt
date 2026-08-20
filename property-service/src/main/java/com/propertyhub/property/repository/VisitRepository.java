@@ -14,4 +14,6 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
     @Query("SELECT v FROM Visit v WHERE v.property.agentId = :agentId")
     List<Visit> findByPropertyAgentId(@Param("agentId") Long agentId);
 
+    void deleteByPropertyId(Long propertyId);
+
 }

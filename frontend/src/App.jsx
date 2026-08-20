@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { ToastProvider } from './context/ToastContext.jsx'
+import { ComparisonProvider } from './context/ComparisonContext.jsx'
 import Toast from './components/common/Toast.jsx'
 import AppLayout from './components/layout/AppLayout.jsx'
 import ProtectedRoute from './components/layout/ProtectedRoute.jsx'
@@ -18,29 +19,31 @@ function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <AppLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<DashboardPage />} />
-              <Route path="properties" element={<PropertySearchPage />} />
-              <Route path="properties/:id" element={<PropertyDetailsPage />} />
-              <Route path="favorites" element={<FavoritesPage />} />
-              <Route path="comparison" element={<ComparisonPage />} />
-              <Route path="visits" element={<VisitsPage />} />
-              <Route path="ai-copilot" element={<AiCopilotPage />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-        <Toast />
+        <ComparisonProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<DashboardPage />} />
+                <Route path="properties" element={<PropertySearchPage />} />
+                <Route path="properties/:id" element={<PropertyDetailsPage />} />
+                <Route path="favorites" element={<FavoritesPage />} />
+                <Route path="comparison" element={<ComparisonPage />} />
+                <Route path="visits" element={<VisitsPage />} />
+                <Route path="ai-copilot" element={<AiCopilotPage />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+          <Toast />
+        </ComparisonProvider>
       </ToastProvider>
     </AuthProvider>
   )

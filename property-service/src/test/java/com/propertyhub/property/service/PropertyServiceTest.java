@@ -10,7 +10,9 @@ import com.propertyhub.property.entity.PropertyType;
 import com.propertyhub.property.exception.InvalidSearchException;
 import com.propertyhub.property.exception.ResourceNotFoundException;
 import com.propertyhub.property.mapper.PropertyMapper;
+import com.propertyhub.property.repository.FavoriteRepository;
 import com.propertyhub.property.repository.PropertyRepository;
+import com.propertyhub.property.repository.VisitRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -36,6 +38,12 @@ class PropertyServiceTest {
 
     @Mock
     private PropertyRepository propertyRepository;
+
+    @Mock
+    private FavoriteRepository favoriteRepository;
+
+    @Mock
+    private VisitRepository visitRepository;
 
     private final ModelMapper modelMapper = new ModelMapper();
     private final PropertyMapper propertyMapper = new PropertyMapper(modelMapper);
@@ -63,7 +71,7 @@ class PropertyServiceTest {
 
     @Test
     void createsAndReturnsProperty() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
         when(propertyRepository.save(any(Property.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         PropertyResponse response = propertyService.create(createRequest());
@@ -75,7 +83,7 @@ class PropertyServiceTest {
 
     @Test
     void getReturnsPropertyWhenFound() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
         Property property = existingProperty();
         when(propertyRepository.findById(1L)).thenReturn(Optional.of(property));
 
@@ -86,7 +94,7 @@ class PropertyServiceTest {
 
     @Test
     void getThrowsWhenNotFound() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
         when(propertyRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> propertyService.get(99L))
@@ -95,7 +103,7 @@ class PropertyServiceTest {
 
     @Test
     void updateModifiesExistingProperty() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
         Property property = existingProperty();
         when(propertyRepository.findById(1L)).thenReturn(Optional.of(property));
 
@@ -114,7 +122,7 @@ class PropertyServiceTest {
 
     @Test
     void updateThrowsWhenNotFound() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
         when(propertyRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> propertyService.update(99L, createUpdateRequest()))
@@ -123,18 +131,20 @@ class PropertyServiceTest {
 
     @Test
     void deleteRemovesExistingProperty() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
         Property property = existingProperty();
         when(propertyRepository.findById(1L)).thenReturn(Optional.of(property));
 
         propertyService.delete(1L);
 
+        verify(favoriteRepository).deleteByPropertyId(1L);
+        verify(visitRepository).deleteByPropertyId(1L);
         verify(propertyRepository).delete(property);
     }
 
     @Test
     void deleteThrowsWhenNotFound() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
         when(propertyRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> propertyService.delete(99L))
@@ -153,7 +163,7 @@ class PropertyServiceTest {
 
     @Test
     void searchReturnsMappedResultsForMatchingFilters() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
         Property property = existingProperty();
         when(propertyRepository.search(eq("Pune"), eq(2), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
                 .thenReturn(List.of(property));
@@ -166,7 +176,7 @@ class PropertyServiceTest {
 
     @Test
     void searchReturnsEmptyListWhenNoFiltersMatch() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
         when(propertyRepository.search(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
                 .thenReturn(List.of());
 
@@ -177,7 +187,7 @@ class PropertyServiceTest {
 
     @Test
     void searchThrowsWhenMinPriceGreaterThanMaxPrice() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
 
         assertThatThrownBy(() -> propertyService.search(
                 null, null, new BigDecimal("9000000"), new BigDecimal("1000000"), null, null, null, null, null
@@ -186,7 +196,7 @@ class PropertyServiceTest {
 
     @Test
     void searchThrowsWhenMinAreaGreaterThanMaxArea() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
 
         assertThatThrownBy(() -> propertyService.search(
                 null, null, null, null, new BigDecimal("2000"), new BigDecimal("500"), null, null, null
@@ -195,7 +205,7 @@ class PropertyServiceTest {
 
     @Test
     void searchThrowsWhenPriceIsNegative() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
 
         assertThatThrownBy(() -> propertyService.search(
                 null, null, new BigDecimal("-1"), null, null, null, null, null, null
@@ -204,7 +214,7 @@ class PropertyServiceTest {
 
     @Test
     void searchThrowsWhenBhkNotPositive() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
 
         assertThatThrownBy(() -> propertyService.search(
                 null, 0, null, null, null, null, null, null, null
@@ -213,7 +223,7 @@ class PropertyServiceTest {
 
     @Test
     void getByIdsReturnsMatchingSummaries() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
         Property property = existingProperty();
         when(propertyRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(property));
 
@@ -225,7 +235,7 @@ class PropertyServiceTest {
 
     @Test
     void getByIdsReturnsEmptyListWhenNoneFound() {
-        propertyService = new PropertyService(propertyRepository, propertyMapper);
+        propertyService = new PropertyService(propertyRepository, favoriteRepository, visitRepository, propertyMapper);
         when(propertyRepository.findAllById(List.of(99L))).thenReturn(List.of());
 
         List<PropertySummaryResponse> results = propertyService.getByIds(List.of(99L));

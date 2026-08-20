@@ -1,10 +1,62 @@
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import Card from '../components/common/Card.jsx'
+import Input from '../components/common/Input.jsx'
+import Button from '../components/common/Button.jsx'
+import ErrorState from '../components/common/ErrorState.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
+import { useToast } from '../context/ToastContext.jsx'
+import { validateLogin } from '../validation/authValidation.js'
+import { login } from '../api/authApi.js'
 
 export default function LoginPage() {
+  const [values, setValues] = useState({ email: '', password: '' })
+  const [errors, setErrors] = useState({})
+  const [formError, setFormError] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+  const { login: setAuth } = useAuth()
+  const { showToast } = useToast()
+  const navigate = useNavigate()
+
+  function handleChange(field) {
+    return (event) => setValues((current) => ({ ...current, [field]: event.target.value }))
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault()
+    const validationErrors = validateLogin(values)
+    setErrors(validationErrors)
+    setFormError(null)
+    if (Object.keys(validationErrors).length > 0) {
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      const response = await login(values)
+      setAuth(response.user, response.token)
+      showToast('Login successful', 'success')
+      navigate('/')
+    } catch (error) {
+      setFormError(error.message || 'Unable to log in')
+      showToast(error.message || 'Unable to log in', 'error')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
-    <Card>
-      <h1>Login</h1>
-      <p>Login form coming in STEP-17.</p>
-    </Card>
+    <div style={{ maxWidth: '420px', margin: '80px auto' }}>
+      <Card>
+        <h1>Login</h1>
+        {formError && <ErrorState message={formError} />}
+        <form onSubmit={handleSubmit}>
+          <Input label="Email" name="email" type="email" value={values.email} onChange={handleChange('email')} error={errors.email} />
+          <Input label="Password" name="password" type="password" value={values.password} onChange={handleChange('password')} error={errors.password} />
+          <Button type="submit" disabled={submitting}>{submitting ? 'Logging in...' : 'Login'}</Button>
+        </form>
+        <p>No account? <Link to="/register">Register</Link></p>
+      </Card>
+    </div>
   )
 }

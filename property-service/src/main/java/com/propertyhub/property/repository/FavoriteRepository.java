@@ -14,4 +14,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
     List<Favorite> findByUserId(Long userId);
 
+    void deleteByPropertyId(Long propertyId);
+
 }

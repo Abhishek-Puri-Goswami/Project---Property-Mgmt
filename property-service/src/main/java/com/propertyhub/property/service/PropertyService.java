@@ -10,9 +10,12 @@ import com.propertyhub.property.entity.PropertyType;
 import com.propertyhub.property.exception.InvalidSearchException;
 import com.propertyhub.property.exception.ResourceNotFoundException;
 import com.propertyhub.property.mapper.PropertyMapper;
+import com.propertyhub.property.repository.FavoriteRepository;
 import com.propertyhub.property.repository.PropertyRepository;
+import com.propertyhub.property.repository.VisitRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -22,10 +25,15 @@ import java.util.List;
 public class PropertyService {
 
     private final PropertyRepository propertyRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final VisitRepository visitRepository;
     private final PropertyMapper propertyMapper;
 
-    public PropertyService(PropertyRepository propertyRepository, PropertyMapper propertyMapper) {
+    public PropertyService(PropertyRepository propertyRepository, FavoriteRepository favoriteRepository,
+                            VisitRepository visitRepository, PropertyMapper propertyMapper) {
         this.propertyRepository = propertyRepository;
+        this.favoriteRepository = favoriteRepository;
+        this.visitRepository = visitRepository;
         this.propertyMapper = propertyMapper;
     }
 
@@ -45,6 +53,7 @@ public class PropertyService {
         return propertyMapper.toResponse(property);
     }
 
+    @Transactional
     public PropertyResponse update(Long id, UpdatePropertyRequest request) {
         Property property = findOrThrow(id);
 
@@ -64,8 +73,11 @@ public class PropertyService {
         return propertyMapper.toResponse(property);
     }
 
+    @Transactional
     public void delete(Long id) {
         Property property = findOrThrow(id);
+        favoriteRepository.deleteByPropertyId(id);
+        visitRepository.deleteByPropertyId(id);
         propertyRepository.delete(property);
     }
 
