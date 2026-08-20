@@ -50,6 +50,11 @@ public class PropertyController {
         ));
     }
 
+    @GetMapping("/batch")
+    public ResponseEntity<List<PropertySummaryResponse>> getByIds(@RequestParam List<Long> ids) {
+        return ResponseEntity.ok(propertyService.getByIds(ids));
+    }
+
     @PostMapping
     public ResponseEntity<PropertyResponse> create(@Valid @RequestBody CreatePropertyRequest request) {
         PropertyResponse response = propertyService.create(request);

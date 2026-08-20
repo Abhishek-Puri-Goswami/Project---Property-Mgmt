@@ -85,6 +85,12 @@ public class PropertyService {
         return results.stream().map(PropertyMapper::toSummary).toList();
     }
 
+    public List<PropertySummaryResponse> getByIds(List<Long> ids) {
+        return propertyRepository.findAllById(ids).stream()
+                .map(PropertyMapper::toSummary)
+                .toList();
+    }
+
     private void validateSearchParams(Integer bhk, BigDecimal minPrice, BigDecimal maxPrice,
                                        BigDecimal minArea, BigDecimal maxArea) {
         if (bhk != null && bhk <= 0) {

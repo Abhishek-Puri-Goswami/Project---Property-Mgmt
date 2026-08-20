@@ -174,4 +174,17 @@ class PropertyControllerTest {
                 .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
     }
 
+    @Test
+    void returns200OnGetByIds() throws Exception {
+        PropertySummaryResponse summary = new PropertySummaryResponse(
+                1L, "2BHK in Hinjewadi", "Pune", new BigDecimal("7200000"), 2,
+                new BigDecimal("1150"), PropertyType.APARTMENT, Furnishing.SEMI_FURNISHED, true
+        );
+        when(propertyService.getByIds(List.of(1L, 2L))).thenReturn(List.of(summary));
+
+        mockMvc.perform(get("/api/properties/batch").param("ids", "1", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1));
+    }
+
 }

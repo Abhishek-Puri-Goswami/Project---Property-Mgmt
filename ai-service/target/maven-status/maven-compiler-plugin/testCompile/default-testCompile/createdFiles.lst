@@ -1,1 +1,3 @@
 com\propertyhub\ai\AiServiceApplicationTests.class
+com\propertyhub\ai\client\PropertyFeignClientLiveCheck.class
+com\propertyhub\ai\service\PropertyClientServiceTest.class

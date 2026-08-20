@@ -202,4 +202,26 @@ class PropertyServiceTest {
         )).isInstanceOf(InvalidSearchException.class);
     }
 
+    @Test
+    void getByIdsReturnsMatchingSummaries() {
+        propertyService = new PropertyService(propertyRepository);
+        Property property = existingProperty();
+        when(propertyRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(property));
+
+        List<PropertySummaryResponse> results = propertyService.getByIds(List.of(1L, 2L));
+
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0).city()).isEqualTo("Pune");
+    }
+
+    @Test
+    void getByIdsReturnsEmptyListWhenNoneFound() {
+        propertyService = new PropertyService(propertyRepository);
+        when(propertyRepository.findAllById(List.of(99L))).thenReturn(List.of());
+
+        List<PropertySummaryResponse> results = propertyService.getByIds(List.of(99L));
+
+        assertThat(results).isEmpty();
+    }
+
 }

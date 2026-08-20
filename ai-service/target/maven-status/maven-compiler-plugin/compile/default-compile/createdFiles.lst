@@ -1,1 +1,9 @@
+com\propertyhub\ai\service\PropertyClientService.class
+com\propertyhub\ai\exception\GlobalExceptionHandler.class
+com\propertyhub\ai\dto\PropertySummaryDto.class
+com\propertyhub\ai\exception\ErrorResponse.class
+com\propertyhub\ai\dto\PropertyDto.class
+com\propertyhub\ai\exception\PropertyNotFoundException.class
 com\propertyhub\ai\AiServiceApplication.class
+com\propertyhub\ai\client\PropertyFeignClient.class
+com\propertyhub\ai\exception\AiServiceException.class
