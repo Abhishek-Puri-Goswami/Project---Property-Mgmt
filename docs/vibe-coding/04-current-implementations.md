@@ -1,4 +1,4 @@
-# PropertyHub — Current Implementation Log (STEP-01 through STEP-17)
+# PropertyHub — Current Implementation Log (STEP-01 through STEP-18)
 
 ## Purpose
 
@@ -520,6 +520,28 @@ feign-okhttp                 (version managed by Spring Cloud BOM)
 
 ---
 
+## STEP-18 — AI Copilot UI
+
+**Objective (per `01-development-plan.md`):** replace the STEP-17 `AiCopilotPage` placeholder with the full chat UI — conversation layout, message history, prompt input, loading indicator, structured recommendation display, property result cards, follow-up conversation support, failure toast, empty state. Showcase flow: natural-language query → AI returns matching properties → follow-up → AI uses prior context.
+
+**Design decision (stated in the plan, not silent):** `POST /api/ai/chat` returns only `{conversationId, messageId, response}` — one grounded text answer (STEP-13's RAG design), not a structured properties list. To render genuine "property result cards" (not text parsed out of prose), the frontend additionally calls the existing `POST /api/ai/requirements` endpoint on the same user message to get structured criteria, then `search()`s property-service with them — mirroring what STEP-13 already does internally server-side. Cards render only when extraction yields a concrete criterion and search returns results (same trigger condition STEP-13 uses backend-side). No backend changes were needed for this STEP.
+
+**Created:**
+- `api/aiApi.js` — `chat()`, `extractRequirement()`, `getConversation()`.
+- `components/ai/{ChatMessageBubble,ChatInput}.jsx` — message bubble styled by role, and the prompt input (disabled while a reply is pending).
+- Tests: `ChatMessageBubble.test.jsx`, `ChatInput.test.jsx`, `AiCopilotPage.test.jsx` — 11 new tests (65 total with STEP-16/17's 54).
+
+**Modified:**
+- `pages/AiCopilotPage.jsx` — full implementation: message history, follow-up support (reuses the response's `conversationId` on subsequent sends), loading indicator, empty state before the first message, property result cards (reusing STEP-17's `PropertyCard`, including Favorite/Compare/Schedule Visit), failure toast ("AI request failed") with the user's message kept visible on failure so they can retry.
+
+**Chat/conversation state kept local to the page** (no new context) — a single active conversation per page visit is sufficient; no other component needs it.
+
+**Issues:** None — built and validated clean on the first attempt.
+
+**Validation result:** `npm run build` → clean production build (128 modules). `npm run test` → 65/65 passing across 20 files. Live, full showcase walkthrough against all five real running services (eureka, gateway, auth, property, ai) with a real OpenAI call through the Capgemini gateway: registered and logged in as a buyer, seeded one matching property, asked *"Find me a 2 BHK in Pune under 80 lakh and tell me if the locality is suitable for an IT professional"* — got a grounded answer correctly citing the real property (₹72 lakh, Hinjewadi, 1150 sqft, parking) and real ingested locality facts (Rajiv Gandhi Infotech Park, short IT commute, the Hinjewadi–Wakad traffic caveat, expanding metro connectivity), **and** a matching property card rendered alongside the text via the client-side requirement-extraction design. Asked a follow-up — *"What was the price of the property you just mentioned?"* — and the AI correctly answered "₹72,00,000" using the same `conversationId`, confirming context-aware follow-up works end-to-end.
+
+---
+
 # 5. Known Open Items / Gaps (not yet resolved, intentionally flagged)
 
 1. **Security gap:** `property-service`, `ai-service`, `api-gateway` have no authentication on their business endpoints. Only `auth-service` has JWT/Spring Security. This needs a dedicated future STEP — do not patch piecemeal.
@@ -532,4 +554,4 @@ feign-okhttp                 (version managed by Spring Cloud BOM)
 
 # 6. Next STEP
 
-Per `01-development-plan.md`: **STEP-18 — AI Copilot UI** (conversation layout, message history, prompt input, loading indicator, structured recommendation display, property result cards, follow-up conversation support, failure toast, empty state — the full AI chat UI, building on STEP-17's `AiCopilotPage` entry point). Not started as of this document's writing. Do not begin it automatically — wait for explicit user instruction, per `CLAUDE.md`'s lifecycle rules.
+Per `01-development-plan.md`: **STEP-19 — Admin Panel** (separate React + Vite application: Admin Dashboard, Users, Agents, Properties, Property Approval/Removal, Statistics, AI Usage Overview, System/Service Status — Axios, Claymorphism, role-aware UI, loading/empty/error states, timeout toasts). Not started as of this document's writing. Do not begin it automatically — wait for explicit user instruction, per `CLAUDE.md`'s lifecycle rules.
