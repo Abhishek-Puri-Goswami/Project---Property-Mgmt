@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.propertyhub.ai.service.PropertyClientServiceTest" time="0.113" tests="5" errors="0" skipped="0" failures="0" flakes="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.propertyhub.ai.rag.DocumentIngestionServiceTest" time="0.475" tests="2" errors="0" skipped="0" failures="0" flakes="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -66,12 +66,14 @@
     <property name="java.class.version" value="65.0"/>
     <property name="LOGGED_APPLICATION_NAME" value="[ai-service] "/>
   </properties>
-  <testcase name="getPropertyThrowsAiServiceExceptionOnOtherFeignError" classname="com.propertyhub.ai.service.PropertyClientServiceTest" time="0.099">
-    <system-out><![CDATA[2026-08-20T23:20:24.591+05:30 ERROR 14844 --- [ai-service] [           main] c.p.ai.service.PropertyClientService     : Property service call failed
+  <testcase name="skipsIngestionWhenStoreAlreadyPopulated" classname="com.propertyhub.ai.rag.DocumentIngestionServiceTest" time="0.368">
+    <system-out><![CDATA[2026-08-20T23:20:23.839+05:30  INFO 14844 --- [ai-service] [           main] c.p.ai.rag.DocumentIngestionService      : Document ingestion requested
+2026-08-20T23:20:23.840+05:30  INFO 14844 --- [ai-service] [           main] c.p.ai.rag.DocumentIngestionService      : Knowledge base already ingested, skipping
 ]]></system-out>
   </testcase>
-  <testcase name="getPropertiesByIdsReturnsResultsOnSuccess" classname="com.propertyhub.ai.service.PropertyClientServiceTest" time="0.002"/>
-  <testcase name="searchPropertiesReturnsResultsOnSuccess" classname="com.propertyhub.ai.service.PropertyClientServiceTest" time="0.002"/>
-  <testcase name="getPropertyThrowsPropertyNotFoundOn404" classname="com.propertyhub.ai.service.PropertyClientServiceTest" time="0.003"/>
-  <testcase name="getPropertyReturnsDtoOnSuccess" classname="com.propertyhub.ai.service.PropertyClientServiceTest" time="0.002"/>
+  <testcase name="ingestsAllSixDocumentsWhenStoreIsEmpty" classname="com.propertyhub.ai.rag.DocumentIngestionServiceTest" time="0.103">
+    <system-out><![CDATA[2026-08-20T23:20:23.872+05:30  INFO 14844 --- [ai-service] [           main] c.p.ai.rag.DocumentIngestionService      : Document ingestion requested
+2026-08-20T23:20:23.936+05:30  INFO 14844 --- [ai-service] [           main] c.p.ai.rag.DocumentIngestionService      : Documents embedded and stored: count=6
+]]></system-out>
+  </testcase>
 </testsuite>

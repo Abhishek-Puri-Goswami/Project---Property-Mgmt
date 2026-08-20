@@ -3,12 +3,15 @@ D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\client\PropertyFeignC
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\config\AiConfig.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\controller\AiChatController.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\controller\ConversationController.java
+D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\controller\KnowledgeController.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\dto\PropertyDto.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\dto\PropertySummaryDto.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\dto\request\ChatRequest.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\dto\response\ChatMessageResponse.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\dto\response\ChatResponse.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\dto\response\ConversationResponse.java
+D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\dto\response\IngestionResponse.java
+D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\dto\response\KnowledgeSearchResult.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\dto\response\PropertyRequirementResponse.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\entity\ChatMessage.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\entity\Conversation.java
@@ -21,6 +24,8 @@ D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\exception\GlobalExcep
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\exception\PropertyNotFoundException.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\memory\ChatMemoryService.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\prompt\PromptConfig.java
+D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\rag\DocumentIngestionService.java
+D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\rag\VectorSearchService.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\repository\ChatMessageRepository.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\repository\ConversationRepository.java
 D:\PropertyHub\ai-service\src\main\java\com\propertyhub\ai\service\AiChatService.java

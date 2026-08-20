@@ -1,6 +1,10 @@
+com\propertyhub\ai\dto\response\KnowledgeSearchResult.class
 com\propertyhub\ai\entity\MessageRole.class
+com\propertyhub\ai\dto\response\IngestionResponse.class
 com\propertyhub\ai\controller\AiChatController.class
+com\propertyhub\ai\rag\VectorSearchService.class
 com\propertyhub\ai\exception\ConversationNotFoundException.class
+com\propertyhub\ai\rag\DocumentIngestionService.class
 com\propertyhub\ai\client\PropertyFeignClient.class
 com\propertyhub\ai\repository\ChatMessageRepository.class
 com\propertyhub\ai\dto\response\ConversationResponse.class
@@ -18,6 +22,7 @@ com\propertyhub\ai\dto\PropertySummaryDto.class
 com\propertyhub\ai\repository\ConversationRepository.class
 com\propertyhub\ai\dto\PropertyDto.class
 com\propertyhub\ai\exception\PropertyNotFoundException.class
+com\propertyhub\ai\controller\KnowledgeController.class
 com\propertyhub\ai\memory\ChatMemoryService.class
 com\propertyhub\ai\controller\ConversationController.class
 com\propertyhub\ai\exception\ErrorResponse.class

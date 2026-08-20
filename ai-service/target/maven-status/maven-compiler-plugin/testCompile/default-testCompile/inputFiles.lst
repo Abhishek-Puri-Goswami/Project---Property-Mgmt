@@ -2,6 +2,9 @@ D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\AiServiceApplicationT
 D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\client\PropertyFeignClientLiveCheck.java
 D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\controller\AiChatControllerTest.java
 D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\controller\ConversationControllerTest.java
+D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\controller\KnowledgeControllerTest.java
 D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\memory\ChatMemoryServiceTest.java
+D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\rag\DocumentIngestionServiceTest.java
+D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\rag\VectorSearchServiceTest.java
 D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\service\AiChatServiceTest.java
 D:\PropertyHub\ai-service\src\test\java\com\propertyhub\ai\service\PropertyClientServiceTest.java
