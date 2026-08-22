@@ -1,0 +1,57 @@
+:root {
+  --color-bg: #e6e9f0;
+  --color-surface: #e6e9f0;
+  --color-primary: #6c63ff;
+  --color-primary-dark: #564fd8;
+  --color-text: #33354a;
+  --color-text-muted: #6b6d84;
+  --color-success: #2f9e6e;
+  --color-error: #d9534f;
+  --color-info: #3b82c4;
+
+  --shadow-light: #ffffff;
+  --shadow-dark: #b8bcc8;
+
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  --toast-timeout: 4000ms;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.clay {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow:
+    8px 8px 16px var(--shadow-dark),
+    -8px -8px 16px var(--shadow-light);
+  border: none;
+}
+
+.clay-inset {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow:
+    inset 4px 4px 8px var(--shadow-dark),
+    inset -4px -4px 8px var(--shadow-light);
+  border: none;
+}

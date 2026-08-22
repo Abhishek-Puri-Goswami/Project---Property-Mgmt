@@ -1,4 +1,4 @@
-# PropertyHub — Current Implementation Log (STEP-01 through STEP-19A)
+# PropertyHub — Current Implementation Log (STEP-01 through STEP-19)
 
 ## Purpose
 
@@ -571,17 +571,49 @@ New admin endpoints in property-service/ai-service were deliberately left **unse
 
 ---
 
+## STEP-19 — Admin Panel
+
+**Objective (per `01-development-plan.md`):** build the second frontend application (`admin-panel/`, bare since STEP-01) against the real data STEP-19A provides — Admin Dashboard, Users, Agents, Properties, Property Approval/Removal, Statistics, AI Usage Overview, System/Service Status.
+
+**Design decisions (stated in the plan, not silent):**
+- **Statistics folds into Dashboard** — no separate duplicate page; the mockup's Dashboard *is* the statistics view.
+- **Property Approval folds into the Properties screen's row actions** (Edit/Delete/Approve), matching the requirements doc's own Property Management UI mockup rather than a separate screen.
+- **Agents = Users filtered to role `AGENT`**, client-side, reusing one `/api/auth/users` fetch (`AgentsPage` is a 3-line wrapper around `UsersPage` with a `roleFilter` prop).
+- **System/Service Status sourced from admin-server's `/instances` endpoint** (Spring Boot Admin, already verified working in STEP-14's live validation) rather than building a new status aggregator.
+- **Admin-panel has its own login** (separate app/origin/localStorage `propertyhub_admin_auth`, port 5174) — client-side rejects non-ADMIN logins with a clear message (not a security boundary; real enforcement is STEP-19A's server-side `hasRole("ADMIN")`).
+
+**Created (admin-panel/, mirroring frontend/'s STEP-16/17 structure exactly):**
+- `styles/theme.css`, `context/{AuthContext,ToastContext}.jsx`, `api/{axiosClient,adminApi}.js`, `components/common/{Button,Input,Select,Card,Table,Modal,LoadingState,EmptyState,ErrorState,Toast}.jsx`, `components/layout/{AdminLayout,ProtectedRoute}.jsx`.
+- `pages/{LoginPage,DashboardPage,UsersPage,AgentsPage,PropertiesPage,AiAnalyticsPage,SystemStatusPage}.jsx`.
+- `adminApi.js` includes `listServiceInstances()`, which calls admin-server directly (`http://localhost:8084/instances`) rather than through the gateway — axios accepts the absolute URL as an override of its configured `baseURL`.
+- 10 test files, 32 tests total, covering the ADMIN-only login rejection, Approve/Edit/Delete flows, and every page's loading/empty/error states.
+- `admin-server/.../config/CorsConfig.java` — new, since admin-server had none.
+
+**Modified:**
+- `api-gateway/.../config/CorsConfig.java` — added `PATCH` to `allowedMethods` (was missing; the STEP-19A Approve endpoint would otherwise fail CORS preflight from either frontend app).
+- `admin-panel/{App,main}.jsx`, `package.json`, `vite.config.js` — same STEP-16-pattern wiring as `frontend/` (routing, providers, `react-router-dom`, `cross-env NODE_OPTIONS=--no-experimental-webstorage`, testing-library deps). `package.json`'s `dev` script pinned to `--port 5174` explicitly (matching the existing CORS allowlists on api-gateway/admin-server, which only permit that exact origin).
+
+**Issue & fix (one real defect, found and fixed during BUILD, before validation):**
+- **Problem:** `admin-server`'s new `CorsConfig` was first written using classic Spring MVC (`WebMvcConfigurer`, `CorsRegistry`) — copied from `api-gateway`'s existing pattern — and failed to compile: `package org.springframework.web.servlet.config.annotation does not exist`. Root cause: `spring-boot-admin-starter-server` pulls in the **reactive WebFlux stack**, not Spring MVC, so those classes aren't on admin-server's classpath at all (unlike every other service in this project, which are all classic Spring MVC).
+- **Fix:** rewrote using the reactive equivalent — a `CorsWebFilter` bean backed by `UrlBasedCorsConfigurationSource`, restricted to `/instances/**` and `http://localhost:5174`. Rebuilt clean.
+- **Lesson for future STEPs:** admin-server is the one service in this project on the reactive stack (inherited from Spring Boot Admin Server's own dependencies) — any future admin-server web config (filters, CORS, etc.) needs the `org.springframework.web.*.reactive`/`WebFlux` APIs, not the `servlet`/MVC ones used everywhere else.
+
+**Validation result:** `npm run build`/`test` → clean build, 32/32 passing. `mvn clean verify` → api-gateway and admin-server both BUILD SUCCESS. Live, all 6 backend services + admin-panel dev server running: logged in as the seeded ADMIN account; Dashboard showed correct live counts (1 property, 8 users, 2 agents, 3 AI conversations) and populated Recent Properties/Users tables; created a new property via curl, confirmed it appeared `PENDING` with an Approve button, approved it and confirmed it flipped to `ACTIVE`; edited a property's price and confirmed the change persisted; deleted a property and confirmed it disappeared (also re-confirming the STEP-17 favorites/visits cascade-delete fix still holds); Users and Agents (correctly filtered) both rendered; AI Analytics matched real seeded conversation data exactly; System Status listed all 5 running services as `UP` via the new admin-server CORS config; logging in as a non-ADMIN user was correctly rejected client-side with "Only administrators can access this panel". (Note: the `computer` click tool's coordinates weren't landing on some buttons during this validation — worked around via direct DOM `.click()` calls through `javascript_tool`; this was a tool-interaction quirk, not an application defect, confirmed by the same actions succeeding once dispatched directly.)
+
+---
+
 # 5. Known Open Items / Gaps (not yet resolved, intentionally flagged)
 
-1. **Security gap:** `property-service`, `ai-service`, `api-gateway` have no authentication on their business endpoints (except the new STEP-19A auth-service admin endpoint and the pre-existing auth-service endpoints). Only `auth-service` has JWT/Spring Security. This needs a dedicated future STEP — do not patch piecemeal.
+1. **Security gap:** `property-service`, `ai-service`, `api-gateway` have no authentication on their business endpoints (except the STEP-19A auth-service admin endpoint and the pre-existing auth-service endpoints). Only `auth-service` has JWT/Spring Security. This needs a dedicated future STEP — do not patch piecemeal. The new STEP-19A property-service/ai-service admin endpoints (`/api/properties/admin`, `/api/properties/{id}/approve`, `/api/ai/conversations`, `/api/ai/analytics`) are likewise unsecured, consistent with this gap — the admin-panel frontend is the only thing currently gating access to them (not a real security boundary).
 2. **Actuator endpoints are fully open (whitelist of `health,info,metrics`, not authenticated)** on all services except that auth-service's JWT filter explicitly permits them — this is linked to item 1 above; proper actuator security requires the broader security rollout first.
 3. Property Service's `agentId`, `Favorite`/`Visit`'s `userId`, and AI Service's `userId` are all supplied directly in request bodies/params (no JWT-derived identity) — will need to change once security is added everywhere.
-4. **Node/jsdom `localStorage` collision** on this machine's Node 25 runtime — permanently worked around via `cross-env NODE_OPTIONS=--no-experimental-webstorage` in the frontend's `test`/`test:ui` npm scripts (see STEP-16). Do not remove that env override from future script changes without confirming the underlying Node behavior has changed.
+4. **Node/jsdom `localStorage` collision** on this machine's Node 25 runtime — permanently worked around via `cross-env NODE_OPTIONS=--no-experimental-webstorage` in both frontend apps' `test`/`test:ui` npm scripts (see STEP-16, STEP-19). Do not remove that env override from future script changes without confirming the underlying Node behavior has changed.
 5. Agent property management has no dedicated "My Properties" filtered list — `PropertySummaryResponse` lacks `agentId`. Agents currently browse the full unfiltered Search page and can only Edit/Delete from Property Details when they own the property. Acceptable for MVP simplicity (see STEP-17's scope decision); revisit if a filtered list becomes a real requirement.
 6. **"RAG Queries" and "Tool Calls" AI Analytics metrics are permanently omitted from the Admin Panel** (see STEP-19A) — no tracking exists for either, and Tool Calling itself is unbuilt (optional STEP-O1). If Tool Calling is ever implemented, revisit adding real tracking for these.
+7. **admin-server is the one service on the reactive WebFlux stack**, not classic Spring MVC (inherited from `spring-boot-admin-starter-server`) — any future web-layer changes there need `org.springframework.web.reactive`/WebFlux APIs, not `servlet`/MVC ones (see STEP-19's CorsConfig lesson).
 
 ---
 
 # 6. Next STEP
 
-Per `01-development-plan.md`: **STEP-19 — Admin Panel** (separate React + Vite application: Admin Dashboard, Users, Agents, Properties, Property Approval/Removal, Statistics, AI Usage Overview, System/Service Status — Axios, Claymorphism, role-aware UI, loading/empty/error states, timeout toasts). Real backend data is now available per STEP-19A. Not started as of this document's writing. Do not begin it automatically — wait for explicit user instruction, per `CLAUDE.md`'s lifecycle rules.
+Per `01-development-plan.md`: **STEP-20 — Frontend Testing with Vitest** (dedicated coverage pass across both frontend apps: form validation, login/register, search/filter interactions, property detail interactions, favorites, comparison, AI chat input/output states, Axios success/failure handling, toast behavior, protected/role-specific UI — using `npm run test` / `npm run test:ui`). Substantial coverage already exists from STEPs 16-19 (86 tests across `frontend/`, 32 across `admin-panel/`); STEP-20 is a dedicated pass to close any remaining gaps and formally verify the Vitest UI/reporting setup. Not started as of this document's writing. Do not begin it automatically — wait for explicit user instruction, per `CLAUDE.md`'s lifecycle rules.

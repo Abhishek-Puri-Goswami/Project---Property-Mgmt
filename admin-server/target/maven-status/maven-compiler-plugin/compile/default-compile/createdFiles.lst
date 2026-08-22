@@ -1,1 +1,2 @@
 com\propertyhub\admin\AdminServerApplication.class
+com\propertyhub\admin\config\CorsConfig.class
